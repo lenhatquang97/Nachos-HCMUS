@@ -56,54 +56,94 @@ ExceptionHandler(ExceptionType which)
     DEBUG(dbgSys, "Received Exception " << which << " type: " << type << "\n");
 
     switch (which) {
-    case SyscallException:
-      switch(type) {
-      case SC_Halt:
-	DEBUG(dbgSys, "Shutdown, initiated by user program.\n");
+			case NoException:
+				SysHalt();
+				return;
+			
+			case PageFaultException:
+				printf("\nPage Fault Exception.\n");
+				ASSERT(false);
+				break;
 
-	SysHalt();
+			case ReadOnlyException:
+				printf("\nReadOnly Exception.\n");
+				ASSERT(false);
+				break;
 
-	ASSERTNOTREACHED();
-	break;
+			case BusErrorException:
+				printf("\nBus error exception.\n");
+				ASSERT(false);
+				break;
 
-      case SC_Add:
-	DEBUG(dbgSys, "Add " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
+		  case AddressErrorException:
+				prinf("\nAddress error exception.\n");
+				ASSERT(false);
+				break;
+			
+			case OverflowException:
+				printf("\nOverflow Exception.\n");
+				ASSERT(false);
+				break;
+
+			case IllegalInstrException:
+				printf("\nIllegal Instr Exception.\n");
+				ASSERT(false);
+				break;
+			
+			case NumExceptionTypes:
+				printf("\nNum Exception Types.\n");
+				ASSERT(false);
+				break;
+
+    	case SyscallException:
+    	  switch(type) {
+    	  	case SC_Halt:
+						DEBUG(dbgSys, "Shutdown, initiated by user program.\n");
+
+						SysHalt();
+
+						ASSERTNOTREACHED();
+						break;
+
+  				case SC_Add:
+						DEBUG(dbgSys, "Add " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
+						printf("%d + %d", kernel->machine->ReadRegister(4), kernel->machine->ReadRegister(5));
+						
+						/* Process SysAdd Systemcall*/
+						int result;
+						result = SysAdd(/* int op1 */(int)kernel->machine->ReadRegister(4),
+								/* int op2 */(int)kernel->machine->ReadRegister(5));
 	
-	/* Process SysAdd Systemcall*/
-	int result;
-	result = SysAdd(/* int op1 */(int)kernel->machine->ReadRegister(4),
-			/* int op2 */(int)kernel->machine->ReadRegister(5));
-
-	DEBUG(dbgSys, "Add returning with " << result << "\n");
-	/* Prepare Result */
-	kernel->machine->WriteRegister(2, (int)result);
+						DEBUG(dbgSys, "Add returning with " << result << "\n");
+						/* Prepare Result */
+						kernel->machine->WriteRegister(2, (int)result);
+						
+						/* Modify return point */
+						{
+						  /* set previous programm counter (debugging only)*/
+						  kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
 	
-	/* Modify return point */
-	{
-	  /* set previous programm counter (debugging only)*/
-	  kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
-
-	  /* set programm counter to next instruction (all Instructions are 4 byte wide)*/
-	  kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
-	  
-	  /* set next programm counter for brach execution */
-	  kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
-	}
-
-	return;
+						  /* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+						  kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+						  
+						  /* set next programm counter for brach execution */
+						  kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
+						}
 	
-	ASSERTNOTREACHED();
-
-	break;
-
-      default:
-	cerr << "Unexpected system call " << type << "\n";
-	break;
-      }
-      break;
-    default:
-      cerr << "Unexpected user mode exception" << (int)which << "\n";
-      break;
-    }
-    ASSERTNOTREACHED();
+						return;
+						
+						ASSERTNOTREACHED();
+	
+						break;
+	
+  				default:
+						cerr << "Unexpected system call " << type << "\n";
+						break;
+  			}
+  			break;
+  		default:
+  			cerr << "Unexpected user mode exception" << (int)which << "\n";
+  			break;
+  	}
+		ASSERTNOTREACHED();
 }
