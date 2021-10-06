@@ -159,6 +159,7 @@ ExceptionHandler(ExceptionType which)
 						int r;
 						srand(time(NULL));
 						r = rand();
+						printf("%d",r);
 						kernel->machine->WriteRegister(2,(int)r);
 						increasePC();
 						return;
