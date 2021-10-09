@@ -157,12 +157,13 @@ ExceptionHandler(ExceptionType which)
 						break;
 				case SC_RandomNum:
 						int r;
-						srand(time(NULL));
-						r = rand();
-						printf("%d",r);
+						RandomInit((unsigned)time(NULL));
+						r = RandomNumber();
+						DEBUG(dbgSys, "Random with number " << r << "\n");
 						kernel->machine->WriteRegister(2,(int)r);
 						increasePC();
 						return;
+
 						ASSERTNOTREACHED();
 						break;
   				default:
