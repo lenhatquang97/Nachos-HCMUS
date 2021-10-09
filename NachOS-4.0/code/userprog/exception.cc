@@ -60,6 +60,7 @@ void increasePC(){
 	/* set next programm counter for brach execution */
 	kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
 }
+
 void
 ExceptionHandler(ExceptionType which)
 {
@@ -155,6 +156,7 @@ ExceptionHandler(ExceptionType which)
 						
 						ASSERTNOTREACHED();
 						break;
+						//Day la vi du Random Number
 				case SC_RandomNum:
 						int r;
 						RandomInit((unsigned)time(NULL));
