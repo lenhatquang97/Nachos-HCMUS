@@ -89,18 +89,25 @@ int main(){
         PrintString("0: Tang dan/1: Giam dan?: ");
         choice = ReadNum();
     }
-    if(choice == 0)
-        for(i = 0; i < n-1; ++i)
-            for(j = 0; j < n-i-1; ++j)
+    if(choice == 0){
+        for(i = 0; i < n-1; ++i){
+            for(j = 0; j < n-i-1; ++j){
                 if(A[j] > A[j+1]) {
                     temp = A[j]; A[j] = A[j+1]; A[j+1] = temp;
-                }            
-    else
-        for(i = 0; i < n-1; ++i)
-            for(j = 0; j < n-i-1; ++j)
+                } 
+            }
+        }  
+    } 
+    else{
+        for(i = 0; i < n-1; ++i){
+            for(j = 0; j < n-i-1; ++j){
                 if(A[j] < A[j+1]) {
                     temp = A[j]; A[j] = A[j+1]; A[j+1] = temp;
                 }
+            }
+        }        
+    }
+        
     PrintString("Mang sap xep ");
     if(choice == 0) PrintString("tang dan:\n");
     else PrintString("giam dan:\n");
