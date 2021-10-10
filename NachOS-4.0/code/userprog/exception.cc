@@ -137,6 +137,58 @@ ExceptionHandler(ExceptionType which)
 						ASSERTNOTREACHED();
 	
 						break;
+				
+				case SC_ReadInt: {
+						char ch = 0; 
+						int ret = 0;
+						bool flag = true;
+						bool sign = false;
+						for (int i = 0; i < 10; i++) {
+							ch = (char)kernel->synchConsoleIn->GetChar();
+							if (i == 0 && ch == '-') {
+								sign = true;
+								continue;
+							}
+							if (ch == 10) break;
+							if ('1' <= ch && ch <= '9') {
+								ret = ret * 10 + ch - '0';
+							}
+							else flag = false;
+						}
+						if (sign == true) ret *= -1;
+						kernel->machine->WriteRegister(2,(flag)?(int)ret:0);
+						increasePC();
+				
+						return;
+
+						ASSERTNOTREACHED();
+						break;
+				}
+
+				case SC_PrintInt: {
+					int num = (int)kernel->machine->ReadRegister(4);
+					bool sign = (num < 0);
+					char a[10];
+					if (num == 0) kernel->synchConsoleOut->PutChar('0');
+					else {
+						size_t len = 0;
+						if (num < 0) num *= -1;
+						while (num != 0) {
+							a[len++] = (num % 10 + '0');
+							num /= 10;
+						}
+						if (sign) kernel->synchConsoleOut->PutChar('-');
+						for (int i = (int)len - 1; i >= 0; i--) {
+							kernel->synchConsoleOut->PutChar(char(a[i]));
+						}
+					}
+					increasePC();
+					return;
+
+					ASSERTNOTREACHED();
+					break;
+				}
+
 				case SC_ReadChar:
 						char ch;
 						ch = (char)kernel->synchConsoleIn->GetChar();

@@ -58,6 +58,22 @@ Add:
 	j 	$31
 	.end Add
 
+	.globl PrintInt
+	.ent	PrintInt
+PrintInt:
+	addiu $2,$0,SC_PrintInt
+	syscall
+	j 	$31
+	.end PrintInt
+	
+	.globl ReadInt
+	.ent	ReadInt
+ReadInt:
+	addiu $2,$0,SC_ReadInt
+	syscall
+	j 	$31
+	.end ReadInt
+
 	.globl ReadChar
 	.ent	ReadChar
 ReadChar:
