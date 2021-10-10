@@ -37,8 +37,8 @@
 
 #define SC_Add		42
 
-#define SC_ReadInt 43
-#define SC_PrintInt 44
+#define SC_ReadNum 43
+#define SC_PrintNum 44
 #define SC_ReadChar 45
 #define SC_PrintChar 46
 #define SC_RandomNum 47
@@ -67,9 +67,9 @@ void Halt();
 
 int Add(int op1, int op2);
 
-int ReadInt();
+int ReadNum();
 
-void PrintInt(int);
+void PrintNum(int);
 
 char ReadChar();
 

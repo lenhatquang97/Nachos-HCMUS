@@ -175,7 +175,7 @@ ExceptionHandler(ExceptionType which)
 	
 						break;
 				
-				case SC_ReadInt: {
+				case SC_ReadNum: {
 						char ch = 0; 
 						int ret = 0;
 						bool flag = true;
@@ -202,7 +202,7 @@ ExceptionHandler(ExceptionType which)
 						break;
 				}
 
-				case SC_PrintInt: {
+				case SC_PrintNum: {
 					int num = (int)kernel->machine->ReadRegister(4);
 					bool sign = (num < 0);
 					char a[10];
