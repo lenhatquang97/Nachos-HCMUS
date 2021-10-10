@@ -281,13 +281,18 @@ ExceptionHandler(ExceptionType which)
 				{
 					int virtAddrWrite;
 					char* bufferWrite;
-					int i = 0;
 					virtAddrWrite = kernel->machine->ReadRegister(4);
 					bufferWrite = User2System(virtAddrWrite, 255);
 					int lengthWrite = 0;
-					while (bufferWrite[lengthWrite] != 0) lengthWrite++;
-					for(i = 0; i < lengthWrite; ++i) {
-						kernel->synchConsoleOut->PutChar(bufferWrite[i]);
+					while (bufferWrite[lengthWrite] != 0){
+						kernel->synchConsoleOut->PutChar(bufferWrite[lengthWrite]);
+						lengthWrite++;
+						if(lengthWrite==255){
+							delete[] bufferWrite;
+							virtAddrWrite = virtAddrWrite + 255;
+							bufferWrite = User2System(virtAddrWrite, 255);
+							lengthWrite = 0;
+						}
 					}
 					delete[] bufferWrite; 
 					increasePC();
