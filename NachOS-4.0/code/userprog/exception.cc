@@ -188,7 +188,12 @@ ExceptionHandler(ExceptionType which)
 							}
 							if (ch == 10) break;
 							if ('1' <= ch && ch <= '9') {
+								int temp = ret;
 								ret = ret * 10 + ch - '0';
+								if (temp > ret) {
+									printf("exception");
+									ExceptionHandler(OverflowException);
+								}
 							}
 							else flag = false;
 						}
