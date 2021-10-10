@@ -259,8 +259,8 @@ ExceptionHandler(ExceptionType which)
 				case SC_ReadString:
 				{
 					int virtAddrRead, lengthRead;
-					virtAddrRead = kernel->machine->ReadRegister(4);
-					lengthRead = kernel->machine->ReadRegister(5);
+					virtAddrRead = (int)kernel->machine->ReadRegister(4);
+					lengthRead = (int)kernel->machine->ReadRegister(5);
 					char* bufferRead = new char[lengthRead+1];
 					for(int i = 0;i < lengthRead; ++i) {
 						bufferRead[i] = kernel->synchConsoleIn->GetChar();
@@ -281,11 +281,12 @@ ExceptionHandler(ExceptionType which)
 				{
 					int virtAddrWrite;
 					char* bufferWrite;
+					int i = 0;
 					virtAddrWrite = kernel->machine->ReadRegister(4);
 					bufferWrite = User2System(virtAddrWrite, 255);
 					int lengthWrite = 0;
-					while (bufferWrite[lengthWrite] != '0') lengthWrite++;
-					for(int i = 0; i < lengthWrite; ++i) {
+					while (bufferWrite[lengthWrite] != 0) lengthWrite++;
+					for(i = 0; i < lengthWrite; ++i) {
 						kernel->synchConsoleOut->PutChar(bufferWrite[i]);
 					}
 					delete[] bufferWrite; 

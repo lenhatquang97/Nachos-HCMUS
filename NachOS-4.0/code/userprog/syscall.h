@@ -69,7 +69,7 @@ int Add(int op1, int op2);
 
 int ReadNum();
 
-void PrintNum(int);
+void PrintNum(int number);
 
 char ReadChar();
 
@@ -77,9 +77,9 @@ void PrintChar(char character);
 
 int RandomNum();
 
-void ReadString (char* buffer, int length);
+void ReadString(char* buffer, int length);
 
-void PrintString (char* buffer);
+void PrintString(char* buffer);
 
 /* Address space control operations: Exit, Exec, Execv, and Join */
 

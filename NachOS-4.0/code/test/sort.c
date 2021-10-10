@@ -70,14 +70,16 @@
 
 #include "syscall.h"
 int main(){
-    int n = 0, A[100], choice;
+    int n, choice,temp;
+    int i,j;
+    int A[100];
     PrintString("Nhap so nguyen duong n = ");
     n = ReadNum();
     while (n <= 0 || n > 100) {
         PrintString("Nhap 0 < n <= 100. n = ");
         n = ReadNum();
     }
-    for(int i = 0; i < n; ++i) {
+    for(i = 0; i < n; ++i) {
         PrintString("A["); PrintNum(i); PrintString("] = ");
         A[i] = ReadNum();
     }
@@ -88,21 +90,21 @@ int main(){
         choice = ReadNum();
     }
     if(choice == 0)
-        for(int i = 0; i < n-1; ++i)
-            for(int j = 0; j < n-i-1; ++j)
+        for(i = 0; i < n-1; ++i)
+            for(j = 0; j < n-i-1; ++j)
                 if(A[j] > A[j+1]) {
-                    int temp = A[j]; A[j] = A[j+1]; A[j+1] = temp;
+                    temp = A[j]; A[j] = A[j+1]; A[j+1] = temp;
                 }            
     else
-        for(int i = 0; i < n-1; ++i)
-            for(int j = 0; j < n-i-1; ++j)
+        for(i = 0; i < n-1; ++i)
+            for(j = 0; j < n-i-1; ++j)
                 if(A[j] < A[j+1]) {
-                    int temp = A[j]; A[j] = A[j+1]; A[j+1] = temp;
+                    temp = A[j]; A[j] = A[j+1]; A[j+1] = temp;
                 }
     PrintString("Mang sap xep ");
     if(choice == 0) PrintString("tang dan:\n");
     else PrintString("giam dan:\n");
-    for(int i = 0; i<n; ++i) {
+    for(i = 0; i<n; ++i) {
         PrintString("A["); PrintNum(i); PrintString("] = ");
         PrintNum(A[i]); PrintString("\n");
     }
