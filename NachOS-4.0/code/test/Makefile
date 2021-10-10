@@ -175,6 +175,18 @@ randomnum: randomnum.o start.o
 	$(LD) $(LDFLAGS) start.o randomnum.o -o randomnum.coff
 	$(COFF2NOFF) randomnum.coff randomnum
 
+ReadString.o: ReadString.c
+	$(CC) $(CFLAGS) -c ReadString.c
+ReadString: ReadString.o start.o
+	$(LD) $(LDFLAGS) start.o ReadString.o -o ReadString.coff
+	$(COFF2NOFF) ReadString.coff ReadString
+
+PrintString.o: PrintString.c
+	$(CC) $(CFLAGS) -c PrintString.c
+PrintString: PrintString.o start.o
+	$(LD) $(LDFLAGS) start.o PrintString.o -o PrintString.coff
+	$(COFF2NOFF) PrintString.coff PrintString	
+
 clean:
 	$(RM) -f *.o *.ii
 	$(RM) -f *.coff
