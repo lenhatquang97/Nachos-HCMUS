@@ -262,19 +262,19 @@ ExceptionHandler(ExceptionType which)
 						break;
 				case SC_ReadString:
 				{
-					int virtAddrRead, lengthRead;
-					virtAddrRead = (int)kernel->machine->ReadRegister(4);
+					int bufferRead, lengthRead;
+					bufferRead = (int)kernel->machine->ReadRegister(4);
 					lengthRead = (int)kernel->machine->ReadRegister(5);
-					char* bufferRead = new char[lengthRead+1];
+					char* tempRead = new char[lengthRead+1];
 					for(int i = 0;i < lengthRead; ++i) {
-						bufferRead[i] = kernel->synchConsoleIn->GetChar();
-						if(bufferRead[i] == '\n') {
-							bufferRead[i+1] = '\0'; break;
+						tempRead[i] = kernel->synchConsoleIn->GetChar();
+						if(tempRead[i] == '\n') {
+							tempRead[i+1] = '\0'; break;
 						}
 					}
-					bufferRead[lengthRead] = '\0';
-					System2User(virtAddrRead, lengthRead, bufferRead);
-					delete[] bufferRead;
+					tempRead[lengthRead] = '\0';
+					System2User(bufferRead, lengthRead, tempRead);
+					delete[] tempRead;
 					increasePC();
 					return;
 					
@@ -283,22 +283,22 @@ ExceptionHandler(ExceptionType which)
 				}
 				case SC_PrintString:
 				{
-					int virtAddrWrite;
-					char* bufferWrite;
-					virtAddrWrite = kernel->machine->ReadRegister(4);
-					bufferWrite = User2System(virtAddrWrite, 255);
+					int bufferWrite;
+					char* tempWrite;
+					bufferWrite = kernel->machine->ReadRegister(4);
+					tempWrite = User2System(bufferWrite, 255);
 					int lengthWrite = 0;
-					while (bufferWrite[lengthWrite] != 0){
-						kernel->synchConsoleOut->PutChar(bufferWrite[lengthWrite]);
+					while (tempWrite[lengthWrite] != 0){
+						kernel->synchConsoleOut->PutChar(tempWrite[lengthWrite]);
 						lengthWrite++;
 						if(lengthWrite==255){
-							delete[] bufferWrite;
-							virtAddrWrite = virtAddrWrite + 255;
-							bufferWrite = User2System(virtAddrWrite, 255);
+							delete[] tempWrite;
+							bufferWrite = bufferWrite + 255;
+							tempWrite = User2System(bufferWrite, 255);
 							lengthWrite = 0;
 						}
 					}
-					delete[] bufferWrite; 
+					delete[] tempWrite; 
 					increasePC();
 					return;
 					
