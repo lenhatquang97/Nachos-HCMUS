@@ -26,6 +26,7 @@
 #include "syscall.h"
 #include "ksyscall.h"
 #include "synchconsole.h"
+#include "machine.h"
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -48,6 +49,41 @@
 //	"which" is the kind of exception.  The list of possible exceptions 
 //	is in machine.h.
 //----------------------------------------------------------------------
+
+char* User2System(int virtAddr, int limit)
+{
+	int i;// index
+	int oneChar;
+	char* kernelBuf = NULL;
+	kernelBuf = new char[limit + 1];//need for terminal string
+	if (kernelBuf == NULL)
+		return kernelBuf;
+	memset(kernelBuf, 0, limit + 1);
+	//printf("\n Filename u2s:");
+	for (i = 0; i < limit; i++)
+	{
+		kernel->machine->ReadMem(virtAddr + i, 1, &oneChar);
+		kernelBuf[i] = (char)oneChar;
+		//printf("%c",kernelBuf[i]);
+		if (oneChar == 0)
+			break;
+	}
+	return kernelBuf;
+}
+
+int System2User(int virtAddr, int len, char* buffer)
+{
+	if (len < 0) return -1;
+	if (len == 0)return len;
+	int i = 0;
+	int oneChar = 0;
+	do {
+		oneChar = (int)buffer[i];
+		kernel->machine->WriteMem(virtAddr + i, 1, oneChar);
+		i++;
+	} while (i < len && oneChar != 0);
+	return i;
+}
 
 //Increase Program Counter
 void increasePC(){
@@ -168,7 +204,32 @@ ExceptionHandler(ExceptionType which)
 
 						ASSERTNOTREACHED();
 						break;
-  				default:
+				case SC_ReadString:
+				{
+					int virtAddrRead, lengthRead;
+					char* bufferRead;
+					virtAddrRead = kernel->machine->ReadRegister(4);
+					lengthRead = kernel->machine->ReadRegister(5);
+					bufferRead = User2System(virtAddrRead, lengthRead);
+					//gSynchConsole->Read(buffer, length);
+					System2User(virtAddrRead, lengthRead, bufferRead);
+					delete[] bufferRead; 
+					increasePC();
+					return;
+				}
+				case SC_PrintString:
+				{
+					int virtAddrWrite;
+					char* bufferWrite;
+					virtAddrWrite = kernel->machine->ReadRegister(4);
+					bufferWrite = User2System(virtAddrWrite, 255);
+					int lengthWrite = 0;
+					while (bufferWrite[lengthWrite] != 0) lengthWrite++;
+					//gSynchConsole->Write(buffer, lengthWrite + 1);
+					delete[] bufferWrite; 
+					increasePC();
+					break;
+				}  				default:
 						cerr << "Unexpected system call " << type << "\n";
 						break;
   			}

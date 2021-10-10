@@ -40,6 +40,9 @@
 #define SC_ReadChar 45
 #define SC_PrintChar 46
 #define SC_RandomNum 47
+#define SC_ReadString 48
+#define SC_PrintString 49
+
 #ifndef IN_ASM
 
 /* The system call interface.  These are the operations the Nachos
@@ -67,6 +70,10 @@ char ReadChar();
 void PrintChar(char character);
 
 int RandomNum();
+
+void ReadString (char* buffer, int length);
+
+void PrintString (char* buffer);
 
 /* Address space control operations: Exit, Exec, Execv, and Join */
 
