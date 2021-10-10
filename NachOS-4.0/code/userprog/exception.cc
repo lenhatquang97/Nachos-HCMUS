@@ -180,7 +180,7 @@ ExceptionHandler(ExceptionType which)
 						int ret = 0;
 						bool flag = true;
 						bool sign = false;
-						for (int i = 0; i < 10; i++) {
+						for (int i = 0; i < 255; i++) {
 							ch = (char)kernel->synchConsoleIn->GetChar();
 							if (i == 0 && ch == '-') {
 								sign = true;
@@ -191,7 +191,6 @@ ExceptionHandler(ExceptionType which)
 								int temp = ret;
 								ret = ret * 10 + ch - '0';
 								if (temp > ret) {
-									printf("exception");
 									ExceptionHandler(OverflowException);
 								}
 							}
@@ -264,8 +263,8 @@ ExceptionHandler(ExceptionType which)
 				case SC_ReadString:
 				{
 					int virtAddrRead, lengthRead;
-					virtAddrRead = kernel->machine->ReadRegister(4);
-					lengthRead = kernel->machine->ReadRegister(5);
+					virtAddrRead = (int)kernel->machine->ReadRegister(4);
+					lengthRead = (int)kernel->machine->ReadRegister(5);
 					char* bufferRead = new char[lengthRead+1];
 					for(int i = 0;i < lengthRead; ++i) {
 						bufferRead[i] = kernel->synchConsoleIn->GetChar();
@@ -289,9 +288,15 @@ ExceptionHandler(ExceptionType which)
 					virtAddrWrite = kernel->machine->ReadRegister(4);
 					bufferWrite = User2System(virtAddrWrite, 255);
 					int lengthWrite = 0;
-					while (bufferWrite[lengthWrite] != '0') lengthWrite++;
-					for(int i = 0; i < lengthWrite; ++i) {
-						kernel->synchConsoleOut->PutChar(bufferWrite[i]);
+					while (bufferWrite[lengthWrite] != 0){
+						kernel->synchConsoleOut->PutChar(bufferWrite[lengthWrite]);
+						lengthWrite++;
+						if(lengthWrite==255){
+							delete[] bufferWrite;
+							virtAddrWrite = virtAddrWrite + 255;
+							bufferWrite = User2System(virtAddrWrite, 255);
+							lengthWrite = 0;
+						}
 					}
 					delete[] bufferWrite; 
 					increasePC();
