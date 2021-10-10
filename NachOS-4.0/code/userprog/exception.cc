@@ -259,15 +259,23 @@ ExceptionHandler(ExceptionType which)
 				case SC_ReadString:
 				{
 					int virtAddrRead, lengthRead;
-					char* bufferRead;
 					virtAddrRead = kernel->machine->ReadRegister(4);
 					lengthRead = kernel->machine->ReadRegister(5);
-					bufferRead = User2System(virtAddrRead, lengthRead);
-					//gSynchConsole->Read(buffer, length);
+					char* bufferRead = new char[lengthRead+1];
+					for(int i = 0;i < lengthRead; ++i) {
+						bufferRead[i] = kernel->synchConsoleIn->GetChar();
+						if(bufferRead[i] == '\n') {
+							bufferRead[i+1] = '\0'; break;
+						}
+					}
+					bufferRead[lengthRead] = '\0';
 					System2User(virtAddrRead, lengthRead, bufferRead);
-					delete[] bufferRead; 
+					delete[] bufferRead;
 					increasePC();
 					return;
+					
+					ASSERTNOTREACHED();
+					break;
 				}
 				case SC_PrintString:
 				{
@@ -276,12 +284,18 @@ ExceptionHandler(ExceptionType which)
 					virtAddrWrite = kernel->machine->ReadRegister(4);
 					bufferWrite = User2System(virtAddrWrite, 255);
 					int lengthWrite = 0;
-					while (bufferWrite[lengthWrite] != 0) lengthWrite++;
-					//gSynchConsole->Write(buffer, lengthWrite + 1);
+					while (bufferWrite[lengthWrite] != '0') lengthWrite++;
+					for(int i = 0; i < lengthWrite; ++i) {
+						kernel->synchConsoleOut->PutChar(bufferWrite[i]);
+					}
 					delete[] bufferWrite; 
 					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
 					break;
-				}  				default:
+				}
+				default:
 						cerr << "Unexpected system call " << type << "\n";
 						break;
   			}
