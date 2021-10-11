@@ -187,7 +187,7 @@ ExceptionHandler(ExceptionType which)
 								continue;
 							}
 							if (ch == 10) break;
-							if ('1' <= ch && ch <= '9') {
+							if ('0' <= ch && ch <= '9') {
 								int temp = ret;
 								ret = ret * 10 + ch - '0';
 								if (temp > ret) {
@@ -265,6 +265,11 @@ ExceptionHandler(ExceptionType which)
 					int bufferRead, lengthRead;
 					bufferRead = (int)kernel->machine->ReadRegister(4);
 					lengthRead = (int)kernel->machine->ReadRegister(5);
+					if(lengthRead<=0){
+						ExceptionHandler(AddressErrorException);
+						increasePC();
+						return;
+					}
 					char* tempRead = new char[lengthRead+1];
 					for(int i = 0;i < lengthRead; ++i) {
 						tempRead[i] = kernel->synchConsoleIn->GetChar();
