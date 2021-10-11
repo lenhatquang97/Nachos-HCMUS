@@ -62,6 +62,7 @@ char* User2System(int virtAddr, int limit)
 	//printf("\n Filename u2s:");
 	for (i = 0; i < limit; i++)
 	{
+		//Doc 1 ki tu
 		kernel->machine->ReadMem(virtAddr + i, 1, &oneChar);
 		kernelBuf[i] = (char)oneChar;
 		//printf("%c",kernelBuf[i]);
@@ -79,6 +80,7 @@ int System2User(int virtAddr, int len, char* buffer)
 	int oneChar = 0;
 	do {
 		oneChar = (int)buffer[i];
+		//Ghi 1 ki tu
 		kernel->machine->WriteMem(virtAddr + i, 1, oneChar);
 		i++;
 	} while (i < len && oneChar != 0);
@@ -181,7 +183,9 @@ ExceptionHandler(ExceptionType which)
 						bool flag = true;
 						bool sign = false;
 						for (int i = 0; i < 255; i++) {
+							// Doc 1 chu so
 							ch = (char)kernel->synchConsoleIn->GetChar();
+							//Xet truong hop so am
 							if (i == 0 && ch == '-') {
 								sign = true;
 								continue;
@@ -190,6 +194,7 @@ ExceptionHandler(ExceptionType which)
 							if ('0' <= ch && ch <= '9') {
 								int temp = ret;
 								ret = ret * 10 + ch - '0';
+								//Truong hop ret vuot qua gioi han cua int thi qua khao sat thi se bi sai lech ve gia tri
 								if (temp > ret) {
 									ExceptionHandler(OverflowException);
 								}
@@ -207,9 +212,11 @@ ExceptionHandler(ExceptionType which)
 				}
 
 				case SC_PrintNum: {
+					//Doc tu tham so thu nhat
 					int num = (int)kernel->machine->ReadRegister(4);
 					bool sign = (num < 0);
 					char a[10];
+					//Neu la so 0
 					if (num == 0) kernel->synchConsoleOut->PutChar('0');
 					else {
 						size_t len = 0;
@@ -232,6 +239,7 @@ ExceptionHandler(ExceptionType which)
 
 				case SC_ReadChar:
 						char ch;
+						//Doc mot ky tu
 						ch = (char)kernel->synchConsoleIn->GetChar();
 						kernel->machine->WriteRegister(2,(int)ch);
 						increasePC();
@@ -242,6 +250,7 @@ ExceptionHandler(ExceptionType which)
 				case SC_PrintChar:
 						char ch_print;
 						ch_print = (char)kernel->machine->ReadRegister(4);
+						//Xuat mot ky tu
 						kernel->synchConsoleOut->PutChar(ch_print);
 						increasePC();
 						return;
@@ -251,7 +260,9 @@ ExceptionHandler(ExceptionType which)
 						//Day la vi du Random Number
 				case SC_RandomNum:
 						int r;
+						//Khoi tao seed trong random
 						RandomInit((unsigned)time(NULL));
+						//random trong khoang cua int
 						r = RandomNumber();
 						DEBUG(dbgSys, "Random with number " << r << "\n");
 						kernel->machine->WriteRegister(2,(int)r);
@@ -263,8 +274,11 @@ ExceptionHandler(ExceptionType which)
 				case SC_ReadString:
 				{
 					int bufferRead, lengthRead;
+					//Doc dia chi cua chuoi
 					bufferRead = (int)kernel->machine->ReadRegister(4);
+					//Doc tham so thu hai
 					lengthRead = (int)kernel->machine->ReadRegister(5);
+					//Truong hop truyen length <=0
 					if(lengthRead<=0){
 						ExceptionHandler(AddressErrorException);
 						increasePC();
@@ -273,11 +287,13 @@ ExceptionHandler(ExceptionType which)
 					char* tempRead = new char[lengthRead+1];
 					for(int i = 0;i < lengthRead; ++i) {
 						tempRead[i] = kernel->synchConsoleIn->GetChar();
+						//Quy uoc chuoi ket thuc la \n
 						if(tempRead[i] == '\n') {
 							tempRead[i+1] = '\0'; break;
 						}
 					}
 					tempRead[lengthRead] = '\0';
+					//Copy tu vung nho system sang user
 					System2User(bufferRead, lengthRead, tempRead);
 					delete[] tempRead;
 					increasePC();
@@ -291,11 +307,14 @@ ExceptionHandler(ExceptionType which)
 					int bufferWrite;
 					char* tempWrite;
 					bufferWrite = kernel->machine->ReadRegister(4);
+					//Khoi tao vung nho tu user cho system
 					tempWrite = User2System(bufferWrite, 255);
 					int lengthWrite = 0;
+					//Truong hop dung thi vi tri chuoi bang 0
 					while (tempWrite[lengthWrite] != 0){
 						kernel->synchConsoleOut->PutChar(tempWrite[lengthWrite]);
 						lengthWrite++;
+						//Truong hop chuoi vuot qua 255
 						if(lengthWrite==255){
 							delete[] tempWrite;
 							bufferWrite = bufferWrite + 255;
