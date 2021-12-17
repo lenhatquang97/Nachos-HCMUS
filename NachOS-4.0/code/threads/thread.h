@@ -129,6 +129,7 @@ class Thread {
     void RestoreUserState();		// restore user-level register state
 
     AddrSpace *space;			// User code this thread is running.
+    int processID;
 };
 
 // external function, dummy routine whose sole job is to call Thread::Print

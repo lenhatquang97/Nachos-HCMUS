@@ -11,9 +11,11 @@
 #include "copyright.h"
 #include "debug.h"
 #include "kernel.h"
+#include "ptable.h"
 
 extern Kernel *kernel;
 extern Debug *debug;
+extern PTable *pTab;
 
 #endif // MAIN_H
 
