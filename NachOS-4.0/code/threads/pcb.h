@@ -6,6 +6,7 @@
 
 #define MAX_SIZE 20
 #define MAX_LEN 255
+#define MAX_FILE 10
 class PCB{
     private:
         Semaphore* joinsem;

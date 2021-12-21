@@ -27,7 +27,6 @@
 #include "ksyscall.h"
 #include "synchconsole.h"
 #include "machine.h"
-#include <fcntl.h>
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -50,56 +49,6 @@
 //	"which" is the kind of exception.  The list of possible exceptions 
 //	is in machine.h.
 //----------------------------------------------------------------------
-
-char* User2System(int virtAddr, int limit)
-{
-	int i;// index
-	int oneChar;
-	char* kernelBuf = NULL;
-	kernelBuf = new char[limit + 1];//need for terminal string
-	if (kernelBuf == NULL)
-		return kernelBuf;
-	memset(kernelBuf, 0, limit + 1);
-	//printf("\n Filename u2s:");
-	for (i = 0; i < limit; i++)
-	{
-		//Doc 1 ki tu
-		kernel->machine->ReadMem(virtAddr + i, 1, &oneChar);
-		kernelBuf[i] = (char)oneChar;
-		//printf("%c",kernelBuf[i]);
-		if (oneChar == 0)
-			break;
-	}
-	return kernelBuf;
-}
-
-int System2User(int virtAddr, int len, char* buffer)
-{
-	if (len < 0) return -1;
-	if (len == 0)return len;
-	int i = 0;
-	int oneChar = 0;
-	do {
-		oneChar = (int)buffer[i];
-		//Ghi 1 ki tu
-		kernel->machine->WriteMem(virtAddr + i, 1, oneChar);
-		i++;
-	} while (i < len && oneChar != 0);
-	return i;
-}
-
-//Increase Program Counter
-void increasePC(){
-	/* set previous programm counter (debugging only)*/
-	kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
-	
-	/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
-	kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
-						  
-	/* set next programm counter for brach execution */
-	kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg)+4);
-}
-
 void
 ExceptionHandler(ExceptionType which)
 {
@@ -330,6 +279,41 @@ ExceptionHandler(ExceptionType which)
 					ASSERTNOTREACHED();
 					break;
 				}
+				case SC_Create:
+					CreateFileSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_Open:
+					OpenSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_Close:
+					CloseSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_Read:
+					ReadSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_Write:
+					WriteSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
 				default:
 						cerr << "Unexpected system call " << type << "\n";
 						break;

@@ -92,6 +92,9 @@ Kernel::Initialize()
     // object to save its state. 
     currentThread = new Thread("main");		
     currentThread->setStatus(RUNNING);
+    memset(FileTable,-1,10*sizeof(FileTable[0]));
+    FileTable[0] = 0;
+    FileTable[1] = 0;
 
     stats = new Statistics();		// collect statistics
     interrupt = new Interrupt;		// start up interrupt handling

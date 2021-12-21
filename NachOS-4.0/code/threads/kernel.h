@@ -56,6 +56,7 @@ class Kernel {
     FileSystem *fileSystem;     
     PostOfficeInput *postOfficeIn;
     PostOfficeOutput *postOfficeOut;
+    int FileTable[10];
 
     int hostName;               // machine identifier
 

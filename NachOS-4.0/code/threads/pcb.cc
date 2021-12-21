@@ -21,7 +21,6 @@ PCB::PCB(int id){
     exitcode = 0;
     numwait = 0;
     thread = NULL;
-    
 }
 PCB::~PCB(){
     if(joinsem != NULL){
