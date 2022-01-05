@@ -1,18 +1,21 @@
-
 #ifndef PTABLE_H
 #define PTABLE_H
-#include "pcb.h"
 
-const int MAX_PROCESS = 10;
+#include "bitmap.h"
+#include "pcb.h"
+#include "synch.h"
+
+#define MAX_PROCESS 10
+
 class PTable {
-private:
-    Bitmap bm;
+ private:
+    Bitmap *bm;
     PCB *pcb[MAX_PROCESS];
     int psize;
     Semaphore *bmsem;
 
-public:
-    PTable(int size);
+ public:
+    PTable(int size = 10);
     ~PTable();
     int ExecUpdate(char *name);
     int ExitUpdate(int ec);
@@ -22,4 +25,5 @@ public:
     void Remove(int pid);
     char *GetFileName(int id);
 };
+
 #endif

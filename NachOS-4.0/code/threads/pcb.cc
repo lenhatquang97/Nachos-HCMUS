@@ -2,6 +2,7 @@
 #include "thread.h"
 #include "kernel.h"
 #include "addrspace.h"
+
 PCB::PCB(){
     pid = 0;
     parentID = -1;
@@ -12,6 +13,7 @@ PCB::PCB(){
     numwait = 0;
     thread = NULL;
 }
+
 PCB::PCB(int id){
     pid = id;
     parentID = kernel->currentThread->processID;
