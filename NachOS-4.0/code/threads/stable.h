@@ -1,7 +1,9 @@
-#ifdef SEM_H
-#define SEM_H
+#ifndef STABLE_H
+#define STABLE_H
 
 #include "synch.h"
+#include "bitmap.h"
+constexpr int MAX_SEMAPHORE = 10;
 
 class Sem {
 private:
@@ -30,5 +32,20 @@ public:
         return name;
     }
 };
+
+class STable {
+ private:
+     Bitmap *bm;
+     Sem *semTab[MAX_SEMAPHORE];
+
+ public:
+     STable();
+     ~STable();
+
+     int Create(char *name, int init);
+     int Wait(char *name);
+     int Signal(char *name);
+     int FindFreeSlot();
+}
 
 #endif
