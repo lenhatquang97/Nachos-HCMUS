@@ -45,10 +45,17 @@
 #include "filesys.h"
 #include "openfile.h"
 #include "sysdep.h"
-
+#include "synch.h"
+#include "bitmap.h"
+#include "ptable.h"
 // global variables
 Kernel *kernel;
 Debug *debug;
+Semaphore *addrLock;
+Bitmap* gPhysPageBitMap; 
+STable* semTab; 
+PTable* pTab;
+
 
 
 //----------------------------------------------------------------------
@@ -61,6 +68,7 @@ Cleanup(int x)
 {     
     cerr << "\nCleaning up after signal " << x << "\n";
     delete kernel; 
+    
 }
 
 //-------------------------------------------------------------------
@@ -301,4 +309,3 @@ main(int argc, char **argv)
     
     ASSERTNOTREACHED();
 }
-

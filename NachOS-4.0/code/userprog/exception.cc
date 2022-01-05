@@ -215,7 +215,7 @@ ExceptionHandler(ExceptionType which)
 
 						ASSERTNOTREACHED();
 						break;
-				}
+				} 
 
 				case SC_PrintNum: {
 					//Doc tu tham so thu nhat
@@ -365,6 +365,48 @@ ExceptionHandler(ExceptionType which)
 					break;
 				case SC_Write:
 					WriteSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_Exec:
+					ExecSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_Join:
+					JoinSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_Exit:
+					ExitSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_CreateSemaphore:
+					CreateSemaphoreSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_Wait:
+					WaitSC();
+					increasePC();
+					return;
+					
+					ASSERTNOTREACHED();
+					break;
+				case SC_Signal: 
+					SignalSC();
 					increasePC();
 					return;
 					

@@ -92,7 +92,17 @@ AddrSpace::~AddrSpace()
 }
 
 AddrSpace::AddrSpace(char* filename){
-    
+ 
+
+    pageTable = new TranslationEntry[NumPhysPages];
+    for (int i = 0; i < NumPhysPages; i++) {
+	pageTable[i].virtualPage = i;	// for now, virt page # = phys page #
+	pageTable[i].physicalPage = i;
+	pageTable[i].valid = TRUE;
+	pageTable[i].use = FALSE;
+	pageTable[i].dirty = FALSE;
+	pageTable[i].readOnly = FALSE;  
+    }
 }
 
 
@@ -197,7 +207,7 @@ AddrSpace::Execute()
 
     kernel->machine->Run();		// jump to the user progam
 
-    ASSERTNOTREACHED();			// machine->Run never returns;
+    ASSERTNOTREACHED(); 			// machine->Run never returns;
 					// the address space exits
 					// by doing the syscall "exit"
 }
@@ -248,7 +258,9 @@ AddrSpace::InitRegisters()
 //----------------------------------------------------------------------
 
 void AddrSpace::SaveState() 
-{}
+{
+    
+}
 
 //----------------------------------------------------------------------
 // AddrSpace::RestoreState

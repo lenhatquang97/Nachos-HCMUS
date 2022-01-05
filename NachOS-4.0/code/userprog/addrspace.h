@@ -26,7 +26,7 @@ class AddrSpace {
 
     bool Load(char *fileName);		// Load a program into addr space from
                                         // a file
-					// return false if not found
+					// return false if not found 
 
     void Execute();             	// Run a program
 					// assumes the program has already

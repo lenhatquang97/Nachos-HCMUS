@@ -21,6 +21,7 @@
 #include "switch.h"
 #include "synch.h"
 #include "sysdep.h"
+#include "main.h"
 
 // this is put at the top of the execution stack, for detecting stack overflows
 const int STACK_FENCEPOST = 0xdedbeef;
@@ -72,7 +73,7 @@ Thread::~Thread()
 //----------------------------------------------------------------------
 // Thread::Fork
 // 	Invoke (*func)(arg), allowing caller and callee to execute 
-//	concurrently.
+//	concurrently. 
 //
 //	NOTE: although our definition allows only a single argument
 //	to be passed to the procedure, it is possible to pass multiple

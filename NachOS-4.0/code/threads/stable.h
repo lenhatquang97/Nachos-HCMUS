@@ -3,7 +3,7 @@
 
 #include "synch.h"
 #include "bitmap.h"
-constexpr int MAX_SEMAPHORE = 10;
+#define MAX_SEMAPHORE 10
 
 class Sem {
 private:
@@ -46,6 +46,6 @@ class STable {
      int Wait(char *name);
      int Signal(char *name);
      int FindFreeSlot();
-}
+};
 
 #endif

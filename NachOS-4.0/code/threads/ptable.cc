@@ -1,5 +1,6 @@
 #include "ptable.h"
 #include "main.h"
+#include "openfile.h"
 
 PTable::PTable(int size) {
     if (size < 0) return;
@@ -7,7 +8,7 @@ PTable::PTable(int size) {
     bm = new Bitmap(size);
     bmsem = new Semaphore("bmsem", 1);
 
-    for (int i = 0; i < MAX_PROCESS; i+) {
+    for (int i = 0; i < MAX_PROCESS; i++) {
         pcb[i] = 0;
     }
     bm->Mark(0);
@@ -34,7 +35,7 @@ int PTable::ExecUpdate(char *name) {
         return -1;
     }
 
-    if (strcmp(name, "./test/scheduler") == 0 || strcmp(name, currentThread->getName()) == 0) {
+    if (strcmp(name, "./test/scheduler") == 0 || strcmp(name, kernel->currentThread->getName()) == 0) {
         printf("\nPTable::Exec: Can't execute\n");
         bmsem->V();
         return -1;
@@ -48,7 +49,7 @@ int PTable::ExecUpdate(char *name) {
     }
     pcb[free_slot] = new PCB(free_slot);
     pcb[free_slot]->SetFileName(name);
-    pcb[free_slot]->parentID = currentThread->processID;
+    pcb[free_slot]->parentID = kernel->currentThread->processID;
 
     int pid = pcb[free_slot]->Exec(name, free_slot);
     bmsem->V();
@@ -61,7 +62,7 @@ int PTable::JoinUpdate(int id) {
         return -1;
     }
 
-    if (currentThread->processID != pcb[id]->parentID) {
+    if (kernel->currentThread->processID != pcb[id]->parentID) {
         printf("\nPTable::JoinUpdate: ");
         return -1;
     }
@@ -74,10 +75,10 @@ int PTable::JoinUpdate(int id) {
 }
 
 int PTable::ExitUpdate(int exit_code) {
-    int id = currentThread->processID;
+    int id = kernel->currentThread->processID;
     if (id == 0) {
-        currentThread->FreeSpace();
-        interrupt->Halt();
+        kernel->currentThread->FreeSpace();
+        kernel->interrupt->Halt();
         return 0;
     }
     if (IsExist(id) == false) {
@@ -93,7 +94,7 @@ int PTable::ExitUpdate(int exit_code) {
 }
 
 int PTable::GetFreeSlot() {
-    return bm->Find();
+    return bm->FindAndSet();
 }
 
 void PTable::Remove(int pid) {

@@ -1,8 +1,8 @@
 #include "pcb.h"
 #include "thread.h"
-#include "kernel.h"
-#include "addrspace.h"
 
+#include "addrspace.h"
+#include "main.h"
 PCB::PCB(){
     pid = 0;
     parentID = -1;
@@ -44,7 +44,7 @@ void StartProcess_2(void* id)
     AddrSpace *space;
     char* filename;
     //TODO
-    filename = pTab->GetFileName((int)id);
+    filename = pTab->GetFileName((int)id); 
     //TODO
     space = new AddrSpace(filename);
 	if(space == NULL)
