@@ -52,8 +52,10 @@
 Kernel *kernel;
 Debug *debug;
 Semaphore *addrLock;
-//Thieu STable
+Bitmap* gPhysPageBitMap; 
+STable* semTab; 
 PTable* pTab;
+
 
 
 //----------------------------------------------------------------------
@@ -66,6 +68,7 @@ Cleanup(int x)
 {     
     cerr << "\nCleaning up after signal " << x << "\n";
     delete kernel; 
+    
 }
 
 //-------------------------------------------------------------------
@@ -306,4 +309,3 @@ main(int argc, char **argv)
     
     ASSERTNOTREACHED();
 }
-

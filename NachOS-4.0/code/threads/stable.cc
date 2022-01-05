@@ -34,7 +34,7 @@ int STable::Create(char *name, int init) {
     if (id < 0) {
         return -1;
     }
-    this->semTab[i] = new Sem(name, init);
+    this->semTab[id] = new Sem(name, init);
     return 0;
 }
 
@@ -65,5 +65,5 @@ int STable::Signal(char *name) {
 }
 
 int STable::FindFreeSlot() {
-    return this->bm->Find();
+    return this->bm->FindAndSet();
 }
