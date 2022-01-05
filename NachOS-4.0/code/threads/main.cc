@@ -45,10 +45,15 @@
 #include "filesys.h"
 #include "openfile.h"
 #include "sysdep.h"
-
+#include "synch.h"
+#include "bitmap.h"
+#include "ptable.h"
 // global variables
 Kernel *kernel;
 Debug *debug;
+Semaphore *addrLock;
+//Thieu STable
+PTable* pTab;
 
 
 //----------------------------------------------------------------------

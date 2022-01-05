@@ -1,7 +1,9 @@
 
+#ifndef PTABLE_H
+#define PTABLE_H
+#include "pcb.h"
 
-const int MAX_PROCESS = 10
-
+const int MAX_PROCESS = 10;
 class PTable {
 private:
     Bitmap bm;
@@ -20,3 +22,4 @@ public:
     void Remove(int pid);
     char *GetFileName(int id);
 };
+#endif

@@ -306,5 +306,34 @@ void WriteSC()
   kernel->machine->WriteRegister(2, (int)answer);
   return;
 }
+void ExecSC(){
+  int bufferWrite;
+  char *tempWrite;
+  bufferWrite = kernel->machine->ReadRegister(4);
+  tempWrite = User2System(bufferWrite, 255);
+  if (tempWrite == NULL)
+  {
+    printf("Khong mo duoc file!!");
+    kernel->machine->WriteRegister(2, -1);
+    return;
+  }
+  
+
+}
+void JoinSC(){
+
+}
+void ExitSC(){
+
+}
+void CreateSemaphoreSC(){
+
+}
+void WaitSC(){
+
+}
+void SignalSC(){
+
+}
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */

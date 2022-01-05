@@ -18,7 +18,7 @@
 /* system call codes -- used by the stubs to tell the kernel which system call
  * is being asked for
  */
-#define SC_Halt		0
+#define SC_Halt		0 
 #define SC_Exit		1
 #define SC_Exec		2
 #define SC_Join		3
@@ -34,6 +34,10 @@
 #define SC_ExecV	13
 #define SC_ThreadExit   14
 #define SC_ThreadJoin   15
+#define SC_CreateSemaphore 16
+#define SC_Wait 17
+#define SC_Signal 18
+
 
 #define SC_Add		42
 
@@ -84,7 +88,7 @@ void PrintString(char* buffer);
 /* Address space control operations: Exit, Exec, Execv, and Join */
 
 /* This user program is done (status = 0 means exited normally). */
-void Exit(int status);	
+void Exit(int exitCode);	
 
 /* A unique identifier for an executing user program (address space) */
 typedef int SpaceId;	
@@ -95,7 +99,7 @@ typedef int ThreadId;
 /* Run the specified executable, with no args */
 /* This can be implemented as a call to ExecV.
  */ 
-SpaceId Exec(char* exec_name);
+SpaceId Exec(char* name);
 
 /* Run the executable, stored in the Nachos file "argv[0]", with
  * parameters stored in argv[1..argc-1] and return the 
@@ -195,6 +199,12 @@ int ThreadJoin(ThreadId id);
  * Deletes current thread and returns ExitCode to every waiting lokal thread.
  */
 void ThreadExit(int ExitCode);	
+
+int CreateSemaphore(char* name, int semval);
+
+int Wait(char* name);
+
+int Signal(char* name);
 
 #endif /* IN_ASM */
 
