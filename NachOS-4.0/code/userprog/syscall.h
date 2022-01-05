@@ -60,6 +60,9 @@
 /* Stop Nachos, and print out performance stats */
 void Halt();		
  
+void Exit(int a, int b);
+int Exec(char *name);
+int Join(int id);
  
 /*
  * Add the two operants and return the result

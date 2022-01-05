@@ -27,6 +27,9 @@
 #include "ksyscall.h"
 #include "synchconsole.h"
 #include "machine.h"
+
+#define MAX_FILE_LENGTH 32
+
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -98,6 +101,59 @@ ExceptionHandler(ExceptionType which)
 
     	case SyscallException:
     	  switch(type) {
+					case SC_Exec: {
+						int virtAddr;
+						virtAddr = machine->ReadRegister(4);
+						char *name;
+						name = User2System(virtAddr, MAX_FILE_LENGTH + 1);
+						if (name == NULL) {
+							DEBUG('a', "\nSC_Exec: not enough memory");
+							printf("\nSC_Exec: not enough memory");
+							machine->WriteRegister(2, -1);
+							return;
+						}
+						OpenFile *o_file = fileSystem->Open(name);
+						if (o_file == NULL) {
+							printf("\nSC_Exec: can't open file");
+							machine->WriteRegister(2, 1);
+							IncreasePC();
+							return;
+						}
+						delete o_file;
+						int id = pTab->ExecUpdate(name);
+						machine->WriteRegister(2, id);
+						delete [] name;
+						IncreasePC();
+						return;
+					}
+
+					case SC_Join: {
+						int exit_status = machine->ReadRegister(4);
+						if (exit_status != 0) {
+							IncreasePC();
+							return;
+						}
+						int res = pTab->ExitUpdate(exit_status);
+						kernel->currentThread->FreeSpace();
+						kernel->currentThread->Finish();
+						IncreasePC();
+						return;
+					}
+
+					case SC_Exit: {
+						int exit_status = machine->ReadRegister(4);
+						if (exit_status != 0) {
+							IncreasePC();
+							return;
+						}
+						int res = pTab->ExitUpdate(exit_status);
+						kernel->currentThread->FreeSpace();
+						kernel->currentThread->Finish();
+						IncreasePC();
+						return;
+					}
+
+
     	  	case SC_Halt:
 						DEBUG(dbgSys, "Shutdown, initiated by user program.\n");
 

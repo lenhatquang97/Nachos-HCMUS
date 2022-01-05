@@ -1,6 +1,5 @@
 #include "ptable.h"
-#include "system.h"
-#include "openfile.h"
+#include "main.h"
 
 PTable::PTable(int size) {
     if (size < 0) return;
