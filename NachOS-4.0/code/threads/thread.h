@@ -104,6 +104,11 @@ class Thread {
     char* getName() { return (name); }
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
+    void FreeSpace(){
+      if (space != 0){
+        delete space;
+      }
+    }
 
   private:
     // some of the private data for this class is listed above

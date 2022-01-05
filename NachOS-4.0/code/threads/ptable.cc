@@ -94,7 +94,7 @@ int PTable::ExitUpdate(int exit_code) {
 }
 
 int PTable::GetFreeSlot() {
-    return bm->Find();
+    return bm->FindAndSet();
 }
 
 void PTable::Remove(int pid) {

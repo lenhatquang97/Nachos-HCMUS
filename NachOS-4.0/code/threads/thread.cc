@@ -72,7 +72,7 @@ Thread::~Thread()
 //----------------------------------------------------------------------
 // Thread::Fork
 // 	Invoke (*func)(arg), allowing caller and callee to execute 
-//	concurrently.
+//	concurrently. 
 //
 //	NOTE: although our definition allows only a single argument
 //	to be passed to the procedure, it is possible to pass multiple
