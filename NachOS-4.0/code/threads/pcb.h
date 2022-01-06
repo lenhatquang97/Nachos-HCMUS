@@ -16,6 +16,7 @@ class PCB{
         int pid;        
         int numwait;
         Bitmap* bmfile;
+        OpenFile** fileTable;
     public:
         int parentID;
         PCB();

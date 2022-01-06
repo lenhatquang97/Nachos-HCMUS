@@ -96,6 +96,14 @@ Kernel::Initialize()
     currentThread = new Thread("main");		
     currentThread->setStatus(RUNNING);
 
+    pTab = new PTable(10);
+    semTab = new STable();
+    gPhysPageBitMap = new Bitmap(256);
+    addrLock = new Semaphore("addrLock",1);
+
+
+
+
     stats = new Statistics();		// collect statistics
     interrupt = new Interrupt;		// start up interrupt handling
     scheduler = new Scheduler();	// initialize the ready queue

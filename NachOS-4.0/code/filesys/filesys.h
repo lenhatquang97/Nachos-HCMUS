@@ -42,22 +42,72 @@
 				// implementation is available
 class FileSystem {
   public:
-    FileSystem() {}
+	OpenFile** openf; //De kiem tra xem file co dang mo khong
+	int index;
+	FileSystem(){}
+    FileSystem(bool format) {
+		openf = new OpenFile*[15];
+		index = 0;
+		for (int i = 0; i < 15; ++i)
+		{
+			openf[i] = NULL;
+		}
+		this->Create("stdin", 0);
+		this->Create("stdout", 0);
+		openf[index++] = this->Open("stdin", 2);
+		openf[index++] = this->Open("stdout", 3);    
+	}
+	
+	//Ham huy doi tuong FileSystem
+	~FileSystem()
+	{
+		for (int i = 0; i < 15; ++i)
+		{
+			if (openf[i] != NULL) delete openf[i];
+		}
+		delete[] openf;
+	}
+	bool Create(char *name, int initialSize) { 
+		int fileDescriptor = OpenForWrite(name);
+
+		if (fileDescriptor == -1) return FALSE;
+		Close(fileDescriptor); 
+		return TRUE; 
+	}
 
     bool Create(char *name) {
-     	int fileDescriptor = OpenForWrite(name);
+	int fileDescriptor = OpenForWrite(name);
 
-    	if (fileDescriptor == -1) return FALSE;
-	    Close(fileDescriptor); 
-	    return TRUE; 
-	  }
+	if (fileDescriptor == -1) return FALSE;
+	Close(fileDescriptor); 
+	return TRUE; 
+	}
 
     OpenFile* Open(char *name) {
-	      int fileDescriptor = OpenForReadWrite(name, FALSE);
+	  int fileDescriptor = OpenForReadWrite(name, FALSE);
 
-	      if (fileDescriptor == -1) return NULL;
-	      return new OpenFile(fileDescriptor);
+	  if (fileDescriptor == -1) return NULL;
+	  return new OpenFile(fileDescriptor);
       }
+
+	OpenFile* Open(char *name, int type) {
+		int fileDescriptor = OpenForReadWrite(name, FALSE);
+
+		if (fileDescriptor == -1) return NULL;
+		//index++;
+		return new OpenFile(fileDescriptor, type);
+	}
+
+	
+	//Ham tim slot trong
+	int FindFreeSlot()
+	{
+		for(int i = 2; i < 15; i++)
+		{
+			if(openf[i] == NULL) return i;		
+		}
+		return -1;
+	}
 
     bool Remove(char *name) { return Unlink(name) == 0; }
 
@@ -66,6 +116,11 @@ class FileSystem {
 #else // FILESYS
 class FileSystem {
   public:
+
+    //Khai bao
+  	OpenFile** openf;
+	int index;
+
     FileSystem(bool format);		// Initialize the file system.
 					// Must be called *after* "synchDisk" 
 					// has been initialized.
@@ -77,7 +132,9 @@ class FileSystem {
 					// Create a file (UNIX creat)
 
     OpenFile* Open(char *name); 	// Open a file (UNIX open)
-
+	OpenFile* Open(char *name, int type); //Mo file voi tham so type
+	
+	int FindFreeSlot();
     bool Remove(char *name);  		// Delete a file (UNIX unlink)
 
     void List();			// List all the files in the file system

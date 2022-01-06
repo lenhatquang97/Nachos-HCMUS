@@ -10,13 +10,13 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
-#ifndef ADDRSPACE_H
+#ifndef ADDRSPACE_H 
 #define ADDRSPACE_H
 
 #include "copyright.h"
 #include "filesys.h"
 
-#define UserStackSize		1024 	// increase this as necessary!
+#define UserStackSize	1024 	// increase this as necessary!
 
 class AddrSpace {
   public:

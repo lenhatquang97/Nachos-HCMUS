@@ -30,8 +30,18 @@ PCB::PCB(int id){
 
 
     bmfile = new Bitmap(MAX_FILE);
-    bmfile->Mark(0);
-    bmfile->Mark(1);
+
+    for(int i = 0;i < MAX_FILE; ++i){
+        fileTable[i] = NULL;
+    }
+    //NOTE TO CHANGE :)
+    fileTable[3] = kernel->fileSystem->Open("stdout");
+    fileTable[3]->type = 0;
+    bmfile->Mark(3);
+
+    fileTable[2] = kernel->fileSystem->Open("stdin");
+    fileTable[2]->type = 1;  
+    bmfile->Mark(2);
 }
 PCB::~PCB(){
     if(joinsem != NULL){
@@ -45,6 +55,11 @@ PCB::~PCB(){
     }
     if(thread != NULL){
         thread->Finish();
+    }
+    for(int i = 2; i < MAX_FILE; ++i){
+        if(fileTable[i] != NULL){
+            delete fileTable[i];
+        }
     }
     if(thread != NULL){
         thread->FreeSpace();

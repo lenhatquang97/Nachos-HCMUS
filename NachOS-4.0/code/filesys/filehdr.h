@@ -15,7 +15,7 @@
 #define FILEHDR_H
 
 #include "disk.h"
-#include "pbitmap.h"
+#include "bitmap.h"
 
 #define NumDirect 	((SectorSize - 2 * sizeof(int)) / sizeof(int))
 #define MaxFileSize 	(NumDirect * SectorSize)
@@ -37,10 +37,10 @@
 
 class FileHeader {
   public:
-    bool Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header, 
+    bool Allocate(Bitmap *bitMap, int fileSize);// Initialize a file header, 
 						//  including allocating space 
 						//  on disk for the file data
-    void Deallocate(PersistentBitmap *bitMap);  // De-allocate this file's 
+    void Deallocate(Bitmap *bitMap);  // De-allocate this file's 
 						//  data blocks
 
     void FetchFrom(int sectorNumber); 	// Initialize file header from disk

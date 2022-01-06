@@ -41,7 +41,7 @@
 //----------------------------------------------------------------------
 
 bool
-FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
+FileHeader::Allocate(Bitmap *freeMap, int fileSize)
 { 
     numBytes = fileSize;
     numSectors  = divRoundUp(fileSize, SectorSize);
@@ -65,7 +65,7 @@ FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
 //----------------------------------------------------------------------
 
 void 
-FileHeader::Deallocate(PersistentBitmap *freeMap)
+FileHeader::Deallocate(Bitmap *freeMap)
 {
     for (int i = 0; i < numSectors; i++) {
 	ASSERT(freeMap->Test((int) dataSectors[i]));  // ought to be marked!

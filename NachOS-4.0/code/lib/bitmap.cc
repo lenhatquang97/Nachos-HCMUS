@@ -189,3 +189,19 @@ Bitmap::SelfTest()
         Clear(i);
     }
 }
+void Bitmap::FetchFrom(OpenFile *file) 
+{
+    file->ReadAt((char *)map, numWords * sizeof(unsigned), 0);
+}
+
+//----------------------------------------------------------------------
+// BitMap::WriteBack
+// 	Store the contents of a bitmap to a Nachos file.
+//
+//	"file" is the place to write the bitmap to
+//----------------------------------------------------------------------
+
+void Bitmap::WriteBack(OpenFile *file)
+{
+   file->WriteAt((char *)map, numWords * sizeof(unsigned), 0);
+}

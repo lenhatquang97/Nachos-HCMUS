@@ -55,7 +55,7 @@
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known 
 // sectors, so that they can be located on boot-up.
-#define FreeMapSector 		0 
+#define FreeMapSector 		0
 #define DirectorySector 	1
 
 // Initial file sizes for the bitmap and directory; until the file system
@@ -336,5 +336,15 @@ FileSystem::Print()
     delete freeMap;
     delete directory;
 } 
+
+//Ham tim slot trong
+int FileSystem::FindFreeSlot()
+{
+	for(int i = 2; i < 15; i++)
+	{
+		if(openf[i] == NULL) return i;		
+	}
+	return -1;
+}
 
 #endif // FILESYS_STUB

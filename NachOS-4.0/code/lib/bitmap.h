@@ -17,6 +17,7 @@
 
 #include "copyright.h"
 #include "utility.h"
+#include "openfile.h"
 
 // Definitions helpful for representing a bitmap as an array of integers
 const int BitsInByte =	8;
@@ -46,6 +47,8 @@ class Bitmap {
 
     void Print() const;		// Print contents of bitmap
     void SelfTest();		// Test whether bitmap is working
+    void FetchFrom(OpenFile *file); 	// fetch contents from disk 
+    void WriteBack(OpenFile *file); 	// write contents to disk
     
   protected:
     int numBits;		// number of bits in the bitmap

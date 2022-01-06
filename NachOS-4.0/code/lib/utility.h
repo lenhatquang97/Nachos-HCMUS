@@ -34,5 +34,36 @@
 
 typedef void (*VoidFunctionPtr)(void *arg); 
 typedef void (*VoidNoArgFunctionPtr)(); 
+ 
+
+// Include interface that isolates us from the host machine system library.
+// Requires definition of bool, and VoidFunctionPtr
+#include "sysdep.h"
+
+// Interface to debugging routines.
+
+extern void DebugInit(char *flags); // enable printing debug messages
+
+extern bool DebugIsEnabled(char flag); // Is this debug flag enabled?
+
+extern void DEBUG(char flag, char *format, ...); // Print debug message
+                                                 // if flag is enabled
+
+//----------------------------------------------------------------------
+// ASSERT
+//      If condition is false,  print a message and dump core.
+//	Useful for documenting assumptions in the code.
+//
+//	NOTE: needs to be a #define, to be able to print the location 
+//	where the error occurred.
+//----------------------------------------------------------------------
+#define ASSERT(condition)                                           \
+    if (!(condition))                                               \
+    {                                                               \
+        fprintf(stderr, "Assertion failed: line %d, file \"%s\"\n", \
+                __LINE__, __FILE__);                                \
+        fflush(stderr);                                             \
+        Abort();                                                    \
+    }
 
 #endif // UTILITY_H
