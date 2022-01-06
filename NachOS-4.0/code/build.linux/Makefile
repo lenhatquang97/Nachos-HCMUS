@@ -287,7 +287,7 @@ THREAD_C = ../threads/alarm.cc\
 	../threads/ptable.cc\
 	../threads/stable.cc
 
-THREAD_O = alarm.o kernel.o main.o scheduler.o synch.o thread.o
+THREAD_O = alarm.o kernel.o main.o scheduler.o synch.o thread.o pcb.o ptable.o stable.o
 
 USERPROG_H = ../userprog/addrspace.h\
 	../userprog/syscall.h\

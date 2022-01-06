@@ -15,7 +15,6 @@
 #include "synchconsole.h"
 #include <fcntl.h>
 #include <unistd.h>
-
 void SysHalt()
 {
   kernel->interrupt->Halt();
@@ -38,7 +37,7 @@ void increasePC()
   kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
 }
 
-char *User2System(int virtAddr, int limit)
+char *User2System(int buffer, int limit)
 {
   int i; // index
   int oneChar;
@@ -51,7 +50,7 @@ char *User2System(int virtAddr, int limit)
   for (i = 0; i < limit; i++)
   {
     //Doc 1 ki tu
-    kernel->machine->ReadMem(virtAddr + i, 1, &oneChar);
+    kernel->machine->ReadMem(buffer + i, 1, &oneChar);
     kernelBuf[i] = (char)oneChar;
     //printf("%c",kernelBuf[i]);
     if (oneChar == 0)
@@ -118,7 +117,7 @@ void OpenSC()
   }
   if (type < 0 || type > 1)
   {
-    printf("Wtf %d",type);
+    printf("Wtf %d", type);
     delete[] tempWrite;
     kernel->machine->WriteRegister(2, -1);
     return;
@@ -225,7 +224,8 @@ void ReadSC()
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if(answer == 0){
+  if (answer == 0)
+  {
     printf("Doc toi cuoi file!!\n");
     kernel->machine->WriteRegister(2, -2);
     return;
@@ -295,45 +295,173 @@ void WriteSC()
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if(answer == sizeof(tempWrite)){
+  if (answer == sizeof(tempWrite))
+  {
     printf("Ghi toi cuoi file!!\n");
     delete[] tempWrite;
     kernel->machine->WriteRegister(2, -2);
     return;
   }
   delete[] tempWrite;
-  
+
   kernel->machine->WriteRegister(2, (int)answer);
   return;
 }
-void ExecSC(){
-  int bufferWrite;
+void ExecSC()
+{
+  int bufferWrite, openState,id;
   char *tempWrite;
   bufferWrite = kernel->machine->ReadRegister(4);
   tempWrite = User2System(bufferWrite, 255);
   if (tempWrite == NULL)
   {
-    printf("Khong mo duoc file!!");
+    DEBUG('a', "\nSC_Exec: not enough memory");
+    printf("\nSC_Exec: not enough memory");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
+  openState = open(tempWrite, 0);
+  if (openState == -1)
+  {
+    printf("\nSC_Exec: can't open file");
+    kernel->machine->WriteRegister(2, -1);
+    increasePC();
+    return;
+  }
+  id = pTab->ExecUpdate(tempWrite); 
+  kernel->machine->WriteRegister(2, id);
+  delete[] tempWrite;
+  increasePC();
+  return;
+}
+
+void JoinSC()
+{
+  // int id, res;
+  // id = kernel->machine->ReadRegister(4);
+  // res = pTab->JoinUpdate(id);
+  // kernel->machine->WriteRegister(2, res);
+  // increasePC();
+  // return;
+}
+void ExitSC()
+{
+  // int exit_status, res;
+  // exit_status = kernel->machine->ReadRegister(4);
+  // if (exit_status != 0)
+  // {
+  //   increasePC();
+  //   return;
+  // }
+  // res = pTab->ExitUpdate(exit_status);
+  // kernel->currentThread->FreeSpace();
+  // kernel->currentThread->Finish();
+  // increasePC();
+  // return;
+}
+void CreateSemaphoreSC()
+{
+  // int bufferWrite, semval,res;
+  // char* name;
+  // bufferWrite = kernel->machine->ReadRegister(4);
+  // semval = kernel->machine->ReadRegister(5);
+
+  // name = User2System(bufferWrite, 255);
+  // if (name == NULL)
+  // {
+  //   DEBUG('a', "\n Not enough memory in System");
+  //   printf("\n Not enough memory in System");
+  //   kernel->machine->WriteRegister(2, -1);
+  //   delete[] name;
+  //   increasePC();
+  //   return;
+  // }
+
+  // res = semTab->Create(name, semval);
+
+  // if (res == -1)
+  // {
+  //   DEBUG('a', "\n Khong the khoi tao semaphore");
+  //   printf("\n Khong the khoi tao semaphore");
+  //   kernel->machine->WriteRegister(2, -1);
+  //   delete[] name;
+  //   increasePC();
+  //   return;
+  // }
+
+  // delete[] name;
+  // kernel->machine->WriteRegister(2, res);
+  // increasePC();
+  // return;
+}
+void WaitSC()
+{
+  // int bufferWrite,res;
+  // char* name;
+  // bufferWrite = kernel->machine->ReadRegister(4);
+
+  // name = User2System(bufferWrite, 255);
+  // if (name == NULL)
+  // {
+  //   DEBUG('a', "\n Not enough memory in System");
+  //   printf("\n Not enough memory in System");
+  //   kernel->machine->WriteRegister(2, -1);
+  //   delete[] name;
+  //   increasePC();
+  //   return;
+  // }
+
+  // res = semTab->Wait(name);
+
+  // if (res == -1)
+  // {
+  //   DEBUG('a', "\n Khong ton tai ten semaphore nay!");
+  //   printf("\n Khong ton tai ten semaphore nay!");
+  //   kernel->machine->WriteRegister(2, -1);
+  //   delete[] name;
+  //   increasePC();
+  //   return;
+  // }
+
+  // delete[] name;
+  // kernel->machine->WriteRegister(2, res);
+  // increasePC();
+  // return;
+}
+void SignalSC()
+{
+  // int bufferWrite, res;
+  // char* name;
   
+  
+  // bufferWrite = kernel->machine->ReadRegister(4);
+  // name = User2System(bufferWrite, 255);
+  // if (name == NULL)
+  // {
+  //   DEBUG('a', "\n Not enough memory in System");
+  //   printf("\n Not enough memory in System");
+  //   kernel->machine->WriteRegister(2, -1);
+  //   delete[] name;
+  //   increasePC();
+  //   return;
+  // }
 
-}
-void JoinSC(){
+  // res = semTab->Signal(name);
 
-}
-void ExitSC(){
+  // if (res == -1)
+  // {
+  //   DEBUG('a', "\n Khong ton tai ten semaphore nay!");
+  //   printf("\n Khong ton tai ten semaphore nay!");
+  //   kernel->machine->WriteRegister(2, -1);
+  //   delete[] name;
+  //   increasePC();
+  //   return;
+  // }
 
-}
-void CreateSemaphoreSC(){
-
-}
-void WaitSC(){
-
-}
-void SignalSC(){
-
+  // delete[] name;
+  // kernel->machine->WriteRegister(2, res);
+  // increasePC();
+  // return;
 }
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */
