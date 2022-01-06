@@ -26,7 +26,7 @@ PTable::~PTable() {
     if (bmsem != 0) delete bmsem;
 }
 
-int PTable::ExecUpdate(char *name) {
+int PTable::ExecUpdate(char *name) { 
     bmsem->P();
 
     if (name == NULL) {
