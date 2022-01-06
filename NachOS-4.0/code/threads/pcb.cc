@@ -99,7 +99,7 @@ int PCB::Exec(char* filename, int pid){
 	    return -1; 
 	}
 	thread->processID = pid;
-    //thread->Fork((VoidFunctionPtr)StartProcess_2,&thread->processID);
+    thread->Fork((VoidFunctionPtr)StartProcess_2,&thread->processID);
     mutex->V();
 	return pid;
 
