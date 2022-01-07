@@ -42,7 +42,7 @@ int PTable::ExecUpdate(char* name)
 {
 
 
-        //Gọi mutex->P(); để giúp tránh tình trạng nạp 2 tiến trình cùng 1 lúc.
+    //Gọi mutex->P(); để giúp tránh tình trạng nạp 2 tiến trình cùng 1 lúc.
 	bmsem->P();
 	
 	// Kiểm tra tính hợp lệ của chương trình “name”.
@@ -144,11 +144,6 @@ int PTable::ExitUpdate(int exitcode)
 		printf("\nPTable::ExitUpdate: This %d is not exist. Try again?", id);
 		return -1;
 	}
-
-	
-
-
-	
 	// Ngược lại gọi SetExitCode để đặt exitcode cho tiến trình gọi.
 	pcb[id]->SetExitCode(exitcode);
 	pcb[pcb[id]->parentID]->DecNumWait();
@@ -188,3 +183,4 @@ char* PTable::GetFileName(int id)
 {
 	return (pcb[id]->GetFileName());
 }
+ 

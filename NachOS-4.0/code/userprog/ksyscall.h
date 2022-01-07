@@ -148,7 +148,7 @@ void ReadSC()
 {
   int virtAddr = kernel->machine->ReadRegister(4);  // Lay dia chi cua tham so buffer tu thanh ghi so 4
   int charcount = kernel->machine->ReadRegister(5); // Lay charcount tu thanh ghi so 5
-  int id = kernel->machine->ReadRegister(6);     
+  int id = kernel->machine->ReadRegister(6);
   int OldPos;
   int NewPos;
   char *buf;
@@ -235,7 +235,7 @@ void WriteSC()
     return;
   }
   OldPos = kernel->fileSystem->openf[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
-  buf = User2System(virtAddr, charcount);  // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
+  buf = User2System(virtAddr, charcount);                  // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
   //Xet truong hop ghi file read & write (type quy uoc la 0) thi tra ve so byte thuc su
   if (kernel->fileSystem->openf[id]->type == 0)
   {
@@ -247,19 +247,19 @@ void WriteSC()
       delete buf;
       return;
     }
-  if (kernel->fileSystem->openf[id]->type == 3) // Xet truong hop con lai ghi file stdout (type quy uoc la 3)
-  {
-    int i = 0;
-    while (buf[i] != 0 && buf[i] != '\n') // Vong lap de write den khi gap ky tu '\n'
+    if (kernel->fileSystem->openf[id]->type == 3) // Xet truong hop con lai ghi file stdout (type quy uoc la 3)
     {
-      kernel->synchConsoleOut->PutChar(buf[i]); // Su dung ham Write cua lop SynchConsole 
-      i++;
-    }
-    buf[i] = '\n';
-    kernel->synchConsoleOut->PutChar(buf[i]); // Write ky tu '\n'
-    kernel->machine->WriteRegister(2, i - 1); // Tra ve so byte thuc su write duoc
-    delete buf;
-    return;
+      int i = 0;
+      while (buf[i] != 0 && buf[i] != '\n') // Vong lap de write den khi gap ky tu '\n'
+      {
+        kernel->synchConsoleOut->PutChar(buf[i]); // Su dung ham Write cua lop SynchConsole
+        i++;
+      }
+      buf[i] = '\n';
+      kernel->synchConsoleOut->PutChar(buf[i]); // Write ky tu '\n'
+      kernel->machine->WriteRegister(2, i - 1); // Tra ve so byte thuc su write duoc
+      delete buf;
+      return;
     }
   }
 }
@@ -267,22 +267,166 @@ void WriteSC()
 //Part 2
 void ExecSC()
 {
-  
+  int virtAddr;
+  virtAddr = kernel->machine->ReadRegister(4); // doc dia chi ten chuong trinh tu thanh ghi r4
+  char *name;
+  name = User2System(virtAddr, 255);
+  if (name == NULL)
+  {
+    DEBUG('a', "\n Not enough memory in System");
+    printf("\n Not enough memory in System");
+    kernel->machine->WriteRegister(2, -1);
+    //IncreasePC();
+    return;
+  }
+  OpenFile *oFile = kernel->fileSystem->Open(name);
+  if (oFile == NULL)
+  {
+    printf("\nExec:: Can't open this file.");
+    kernel->machine->WriteRegister(2, -1);
+    increasePC();
+    return;
+  }
+
+  delete oFile;
+
+  // Return child process id
+  int id = pTab->ExecUpdate(name);
+  kernel->machine->WriteRegister(2, id);
+
+  delete[] name;
+  increasePC();
+  return;
 }
 void JoinSC()
 {
+  // int Join(SpaceId id)
+  // Input: id dia chi cua thread
+  // Output:
+  int id = kernel->machine->ReadRegister(4);
+
+  int res = pTab->JoinUpdate(id);
+
+  kernel->machine->WriteRegister(2, res);
+  increasePC();
+  return;
 }
 void ExitSC()
 {
+  int exitStatus = kernel->machine->ReadRegister(4);
+
+  if (exitStatus != 0)
+  {
+    increasePC();
+    return;
+  }
+
+  int res = pTab->ExitUpdate(exitStatus);
+  //machine->WriteRegister(2, res);
+
+  kernel->currentThread->FreeSpace();
+  kernel->currentThread->Finish();
+  increasePC();
+  return;
 }
 void CreateSemaphoreSC()
 {
+  // int CreateSemaphore(char* name, int semval).
+  int virtAddr = kernel->machine->ReadRegister(4);
+  int semval = kernel->machine->ReadRegister(5);
+
+  char *name = User2System(virtAddr, 255);
+  if (name == NULL)
+  {
+    DEBUG('a', "\n Not enough memory in System");
+    printf("\n Not enough memory in System");
+    kernel->machine->WriteRegister(2, -1);
+    delete[] name;
+    increasePC();
+    return;
+  }
+
+  int res = semTab->Create(name, semval);
+
+  if (res == -1)
+  {
+    DEBUG('a', "\n Khong the khoi tao semaphore");
+    printf("\n Khong the khoi tao semaphore");
+    kernel->machine->WriteRegister(2, -1);
+    delete[] name;
+    increasePC();
+    return;
+  }
+
+  delete[] name;
+  kernel->machine->WriteRegister(2, res);
+  increasePC();
+  return;
 }
 void WaitSC()
 {
+  // int Wait(char* name)
+  int virtAddr = kernel->machine->ReadRegister(4);
+
+  char *name = User2System(virtAddr, 255);
+  if (name == NULL)
+  {
+    DEBUG('a', "\n Not enough memory in System");
+    printf("\n Not enough memory in System");
+    kernel->machine->WriteRegister(2, -1);
+    delete[] name;
+    increasePC();
+    return;
+  }
+
+  int res = semTab->Wait(name);
+
+  if (res == -1)
+  {
+    DEBUG('a', "\n Khong ton tai ten semaphore nay!");
+    printf("\n Khong ton tai ten semaphore nay!");
+    kernel->machine->WriteRegister(2, -1);
+    delete[] name;
+    increasePC();
+    return;
+  }
+
+  delete[] name;
+  kernel->machine->WriteRegister(2, res);
+  increasePC();
+  return;
 }
 void SignalSC()
 {
+  int virtAddr = kernel->machine->ReadRegister(4);
+
+  char *name = User2System(virtAddr, 255);
+  if (name == NULL)
+  {
+    DEBUG('a', "\n Not enough memory in System");
+    printf("\n Not enough memory in System");
+    kernel->machine->WriteRegister(2, -1);
+    delete[] name;
+    increasePC();
+    return;
+  }
+
+  int res = semTab->Signal(name);
+
+  if (res == -1)
+  {
+    DEBUG('a', "\n Khong ton tai ten semaphore nay!");
+    printf("\n Khong ton tai ten semaphore nay!");
+    kernel->machine->WriteRegister(2, -1);
+    delete[] name;
+    increasePC();
+    return;
+  }
+
+  delete[] name;
+  kernel->machine->WriteRegister(2, res);
+  increasePC();
+  return;
 }
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */

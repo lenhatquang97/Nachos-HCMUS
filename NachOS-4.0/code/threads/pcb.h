@@ -20,12 +20,15 @@ private:
     char FileName[32];          // Ten cua tien trinh
 
     Thread* thread;             // Tien trinh cua chuong trinh
+    Bitmap* bmfile;
+    int pid;
 public:
     int parentID;               // ID cua tien trinh cha
     
     char boolBG;                // Kiem tra neu la tien trinh nen
     OpenFile** fileTable;
     int fileIdx;
+    
     
     PCB(int = 0);               // Contructor
     ~PCB();                     // Destructor
@@ -34,11 +37,8 @@ public:
     int GetID();                // Trả về ProcessID của tiến trình gọi thực hiện
     int GetNumWait();           // Trả về số lượng tiến trình chờ
 
-    bool CreateFile(char *name, int initialSize);
-    OpenFile* Open(char *name, int type);
-    OpenFile* Open(char *name);
+
     int FindFreeSlot();
-    bool Remove(char *name);
 
     void JoinWait();            // 1. Tiến trình cha đợi tiến trình con kết thúc
                         
@@ -55,6 +55,7 @@ public:
 
     void SetFileName(char*);    // Set ten tien trinh
     char* GetFileName();        // Tra ve ten tien trinh
+    bool IsExist(int);
 };
 
 #endif // PCB_H
