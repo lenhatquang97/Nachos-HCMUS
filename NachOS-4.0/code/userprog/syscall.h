@@ -19,21 +19,45 @@
  * is being asked for
  */
 #define SC_Halt		0
+
+
+//First
 #define SC_Exit		1
 #define SC_Exec		2
 #define SC_Join		3
 #define SC_Create	4
+
+
+
 #define SC_Remove       5
+
+
+//Second
 #define SC_Open		6
 #define SC_Read		7
 #define SC_Write	8
+
 #define SC_Seek         9
+
+
+//Third
 #define SC_Close	10
+
+
+
 #define SC_ThreadFork	11
 #define SC_ThreadYield	12
 #define SC_ExecV	13
 #define SC_ThreadExit   14
 #define SC_ThreadJoin   15
+
+
+//Fourth
+#define SC_CreateSemaphore 16
+#define SC_Wait 17
+#define SC_Signal 18
+//Fourth
+
 
 #define SC_Add		42
 
@@ -133,7 +157,7 @@ typedef int OpenFileId;
 /* Create a Nachos file, with name "name" */
 /* Note: Create does not open the file.   */
 /* Return 1 on success, negative error code on failure */
-int Create(char *name);
+int CreateFile(char *name);
 
 /* Remove a Nachos file, with name "name" */
 int Remove(char *name);
@@ -141,7 +165,7 @@ int Remove(char *name);
 /* Open the Nachos file "name", and return an "OpenFileId" that can 
  * be used to read and write to the file.
  */
-OpenFileId Open(char *name);
+OpenFileId Open(char *name, int type);
 
 /* Write "size" bytes from "buffer" to the open file. 
  * Return the number of bytes actually read on success.
@@ -195,6 +219,12 @@ int ThreadJoin(ThreadId id);
  * Deletes current thread and returns ExitCode to every waiting lokal thread.
  */
 void ThreadExit(int ExitCode);	
+
+int CreateSemaphore(char* name, int semval);
+
+int Wait(char* name);
+
+int Signal(char* name);
 
 #endif /* IN_ASM */
 

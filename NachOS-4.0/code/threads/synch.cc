@@ -56,6 +56,9 @@ Semaphore::Semaphore(char* debugName, int initialValue)
 // 	De-allocate semaphore, when no longer needed.  Assume no one
 //	is still waiting on the semaphore!
 //----------------------------------------------------------------------
+bool Lock::IsHeldByCurrentThread(){
+    return lockHolder == kernel->currentThread; 
+}
 
 Semaphore::~Semaphore()
 {

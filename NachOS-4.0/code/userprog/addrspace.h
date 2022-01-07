@@ -10,18 +10,22 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
-#ifndef ADDRSPACE_H
-#define ADDRSPACE_H
-
-#include "copyright.h"
-#include "filesys.h"
+#ifndef MADDRSPACE_H
+#define MADDRSPACE_H
 
 #define UserStackSize		1024 	// increase this as necessary!
 
+#include "copyright.h"
+#include "filesys.h"
+#include "synch.h"
+
 class AddrSpace {
   public:
-    AddrSpace();			// Create an address space.
+    //AddrSpace();			// Create an address space.
     ~AddrSpace();			// De-allocate an address space
+
+    AddrSpace(OpenFile* executable);
+    AddrSpace(char* filename);
 
     bool Load(char *fileName);		// Load a program into addr space from
                                         // a file
@@ -38,6 +42,7 @@ class AddrSpace {
     // to physical address _paddr_. _mode_
     // is 0 for Read, 1 for Write.
     ExceptionType Translate(unsigned int vaddr, unsigned int *paddr, int mode);
+    void InitRegisters();		// Initialize user-level CPU registers,
 
   private:
     TranslationEntry *pageTable;	// Assume linear page table translation
@@ -45,7 +50,6 @@ class AddrSpace {
     unsigned int numPages;		// Number of pages in the virtual 
 					// address space
 
-    void InitRegisters();		// Initialize user-level CPU registers,
 					// before jumping to user code
 
 };

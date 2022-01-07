@@ -37,6 +37,7 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+
 #define MAIN
 #include "copyright.h"
 #undef MAIN
@@ -45,11 +46,18 @@
 #include "filesys.h"
 #include "openfile.h"
 #include "sysdep.h"
+#include "synch.h"
+#include "bitmap.h"
+#include "ptable.h"
+
 
 // global variables
 Kernel *kernel;
 Debug *debug;
-
+Semaphore* addrLock;
+Bitmap *gPhysPageBitMap;
+PTable* pTab;
+STable *semTab;
 
 //----------------------------------------------------------------------
 // Cleanup
@@ -249,6 +257,15 @@ main(int argc, char **argv)
 
     kernel = new Kernel(argc, argv);
 
+    addrLock = new Semaphore("addrLock", 1);
+
+    gPhysPageBitMap = new Bitmap(256);
+
+    pTab = new PTable(10);
+
+    semTab  = new STable();
+    // define here
+
     kernel->Initialize();
 
     CallOnUserAbort(Cleanup);		// if user hits ctl-C
@@ -285,7 +302,7 @@ main(int argc, char **argv)
 
     // finally, run an initial user program if requested to do so
     if (userProgName != NULL) {
-      AddrSpace *space = new AddrSpace;
+      AddrSpace *space = new AddrSpace(userProgName);
       ASSERT(space != (AddrSpace *)NULL);
       if (space->Load(userProgName)) {  // load the program into the space
 	space->Execute();              // run the program
@@ -301,4 +318,3 @@ main(int argc, char **argv)
     
     ASSERTNOTREACHED();
 }
-

@@ -337,4 +337,14 @@ FileSystem::Print()
     delete directory;
 } 
 
+//Ham tim slot trong
+int FileSystem::FindFreeSlot()
+{
+	for(int i = 2; i < 15; i++)
+	{
+		if(openf[i] == NULL) return i;		
+	}
+	return -1;
+}
+
 #endif // FILESYS_STUB

@@ -24,6 +24,8 @@ class PostOfficeOutput;
 class SynchConsoleInput;
 class SynchConsoleOutput;
 class SynchDisk;
+class Thread;
+class Scheduler;
 
 class Kernel {
   public:
