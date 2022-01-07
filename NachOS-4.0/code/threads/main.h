@@ -8,15 +8,15 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "stable.h"
+#include "ptable.h"
 #include "copyright.h"
 #include "debug.h"
 #include "kernel.h"
-#include "ptable.h"
 #include "bitmap.h"
+#include "stable.h"
 
 class PTable;
-
+class Semaphore;
 extern Kernel *kernel;
 extern Debug *debug;
 extern Bitmap *gPhysPageBitMap;

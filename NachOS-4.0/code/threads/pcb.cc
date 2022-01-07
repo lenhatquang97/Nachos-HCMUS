@@ -1,8 +1,5 @@
+#include "main.h"
 #include "pcb.h"
-#include "utility.h"
-#include "addrspace.h"
-#include "thread.h"
-
 //extern void StartProcess_2(int id);
 
 PCB::PCB(int id)
@@ -18,7 +15,53 @@ PCB::PCB(int id)
 	this->joinsem = new Semaphore("joinsem",0);
 	this->exitsem = new Semaphore("exitsem",0);
 	this->multex = new Semaphore("multex",1);
+
+	this->fileTable = new OpenFile*[MAX_FILE];
+	fileIdx = 0;
+	for (int i = 0; i < 10; ++i)
+	{
+		fileTable[i] = NULL;
+	}
+	this->CreateFile("stdin", 0);
+	this->CreateFile("stdout", 0);
+	fileTable[fileIdx++] = this->Open("stdin", 2);
+	fileTable[fileIdx++] = this->Open("stdout", 3);
 }
+
+OpenFile* PCB::Open(char *name, int type){
+	int fileDescriptor = OpenForReadWrite(name, FALSE);
+
+	if (fileDescriptor == -1) return NULL;
+	//index++;
+	return new OpenFile(fileDescriptor, type);
+}
+
+OpenFile* PCB::Open(char *name) {
+	int fileDescriptor = OpenForReadWrite(name, FALSE);
+
+	if (fileDescriptor == -1) return NULL;
+	return new OpenFile(fileDescriptor);
+}
+
+int PCB::FindFreeSlot()
+{
+	for(int i = 2; i < 10; i++)
+	{
+		if(fileTable[i] == NULL) return i;		
+	}
+	return -1;
+}
+
+bool PCB::Remove(char *name) { return Unlink(name) == 0; }
+
+bool PCB::CreateFile(char *name, int initialSize){
+	int fileDescriptor = OpenForWrite(name);
+
+	if (fileDescriptor == -1) return FALSE;
+	Close(fileDescriptor); 
+	return TRUE; 
+}
+
 PCB::~PCB()
 {	
 	if(joinsem != NULL)
@@ -32,6 +75,11 @@ PCB::~PCB()
 		thread->FreeSpace();
 		thread->Finish();
 	}
+	for (int i = 0; i < 10; ++i)
+		{
+			if (fileTable[i] != NULL) delete fileTable[i];
+		}
+	delete[] fileTable;
 }
 int PCB::GetID(){ return this->thread->processID; }
 int PCB::GetNumWait() { return this->numwait; }

@@ -1,12 +1,9 @@
 #ifndef PTABLE_H
 #define PTABLE_H
 #define MAX_PROCESS 10
-
 #include "bitmap.h"
-#include "synch.h"
-#include "thread.h"
 #include "pcb.h"
-class PCB;
+class Semaphore;
 
 class PTable
 {
@@ -26,6 +23,7 @@ public:
     int ExecUpdate(char*);      // Xử lý cho system call SC_Exit
     int ExitUpdate(int);        // Xử lý cho system call SC_Exit
     int JoinUpdate(int);        // Xử lý cho system call SC_Join
+    PCB *GetPCB(int id);
 
     int GetFreeSlot();          // tìm free slot để lưu thông tin cho tiến trình mới
     bool IsExist(int pid);      // kiểm tra tồn tại processID này không?

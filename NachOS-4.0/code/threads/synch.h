@@ -21,7 +21,7 @@
 #include "thread.h"
 #include "list.h"
 #include "main.h"
-
+class Thread;
 // The following class defines a "semaphore" whose value is a non-negative
 // integer.  The semaphore has only two operations P() and V():
 //
@@ -36,7 +36,6 @@
 // into a register, a context switch might have occurred,
 // and some other thread might have called P or V, so the true value might
 // now be different.
-
 class Semaphore {
   public:
     Semaphore(char* debugName, int initialValue);	// set initial value

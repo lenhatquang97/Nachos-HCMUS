@@ -1,5 +1,6 @@
 #include "ptable.h"
-#include "openfile.h"
+#include "main.h"
+
 #define For(i,a,b) for (int i = (a); i < b; ++i)
 
 PTable::PTable(int size)
@@ -121,6 +122,11 @@ int PTable::JoinUpdate(int id)
     // Successfully
 	return ec;
 }
+
+PCB * PTable::GetPCB(int id){
+	return pcb[id];
+}
+
 int PTable::ExitUpdate(int exitcode)
 {              
     // Nếu tiến trình gọi là main process thì gọi Halt().

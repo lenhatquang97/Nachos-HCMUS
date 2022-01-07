@@ -1,10 +1,12 @@
 #ifndef PCB_H
 #define PCB_H
 
+#define MAX_FILE 10
 #include "thread.h"
 #include "synch.h"
-#include "main.h" 
-// Process Control Block
+class Semaphore;
+class Thread;
+
 class PCB
 {
 private:
@@ -22,6 +24,8 @@ public:
     int parentID;               // ID cua tien trinh cha
     
     char boolBG;                // Kiem tra neu la tien trinh nen
+    OpenFile** fileTable;
+    int fileIdx;
     
     PCB(int = 0);               // Contructor
     ~PCB();                     // Destructor
@@ -30,6 +34,11 @@ public:
     int GetID();                // Trả về ProcessID của tiến trình gọi thực hiện
     int GetNumWait();           // Trả về số lượng tiến trình chờ
 
+    bool CreateFile(char *name, int initialSize);
+    OpenFile* Open(char *name, int type);
+    OpenFile* Open(char *name);
+    int FindFreeSlot();
+    bool Remove(char *name);
 
     void JoinWait();            // 1. Tiến trình cha đợi tiến trình con kết thúc
                         
