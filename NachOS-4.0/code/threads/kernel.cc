@@ -127,7 +127,9 @@ Kernel::~Kernel()
     delete synchConsoleIn;
     delete synchConsoleOut;
     delete synchDisk;
-    delete fileSystem;
+    if (fileSystem != NULL){
+        delete fileSystem;
+    }
     delete postOfficeIn;
     delete postOfficeOut;
     

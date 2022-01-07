@@ -65,6 +65,10 @@ Cleanup(int x)
 {
     cerr << "\nCleaning up after signal " << x << "\n";
     delete kernel;
+    delete addrLock;
+    delete gPhysPageBitMap;
+    delete pTab;
+    delete semTab;
 }
 
 //-------------------------------------------------------------------
@@ -290,7 +294,6 @@ int main(int argc, char **argv)
     {
         kernel->NetworkTest(); // two-machine test of the network
     }
-
 #ifndef FILESYS_STUB
     if (removeFileName != NULL)
     {
@@ -325,11 +328,11 @@ int main(int argc, char **argv)
             ASSERTNOTREACHED(); // Execute never returns
         }
     }
-
     // If we don't run a user program, we may get here.
     // Calling "return" would terminate the program.
     // Instead, call Halt, which will first clean up, then
     //  terminate.
+    
     kernel->interrupt->Halt();
 
     ASSERTNOTREACHED();
