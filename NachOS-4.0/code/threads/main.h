@@ -16,6 +16,7 @@
 #include "stable.h"
 
 class PTable;
+class STable;
 class Semaphore;
 extern Kernel *kernel;
 extern Debug *debug;
