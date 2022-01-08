@@ -64,8 +64,8 @@ PCB::~PCB()
 void StartProcess_2(void *pid)
 {
 	// Lay fileName cua process id nay
-	int id = ((int)pid);
-	printf("%d\n", id);
+	int id = *((int*)pid);
+	delete (int*)pid;
 	char *fileName = pTab->GetFileName((int)id);
 	AddrSpace *space;
 	space = new AddrSpace(fileName);
@@ -101,12 +101,15 @@ int PCB::Exec(char *filename, int id)
 		return -1;
 	}
 	//  Đặt processID của thread này là id.
-	this->thread->processID = id;
+	this->thread->processID = id; 
+	
 	// Đặt parrentID của thread này là processID của thread gọi thực thi Exec
-	this->parentID = kernel->currentThread->processID;
+	this->parentID = kernel->currentThread->processID; 
 	// Gọi thực thi Fork(StartProcess_2,id) => Ta cast thread thành kiểu int, sau đó khi xử ký hàm StartProcess ta cast Thread về đúng kiểu của nó.
 	printf("\nThread %d is created.\n", id);
-	this->thread->Fork(StartProcess_2, &id); // StartProcess_2 : void Func(void* Args)
+	void *pid = new int;
+	*(int *)pid = id;
+	this->thread->Fork(StartProcess_2, pid); // StartProcess_2 : void Func(void* Args)
 
 	multex->V();
 	// Trả về id.
