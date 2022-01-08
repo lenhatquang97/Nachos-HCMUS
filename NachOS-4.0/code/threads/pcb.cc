@@ -24,12 +24,12 @@ PCB::PCB(int id)
 	{
 		fileTable[i] = NULL;
 	}
-
+	kernel->fileSystem->Create("stdout",0);
 	fileTable[CONSOLE_OUT] = kernel->fileSystem->Open("stdout");
 	fileTable[CONSOLE_OUT]->type = 1; 
 	bmfile->Mark(CONSOLE_OUT);
 
-	
+	kernel->fileSystem->Create("stdin",0);
 	fileTable[CONSOLE_INP] = kernel->fileSystem->Open("stdin");
 	fileTable[CONSOLE_INP]->type = 0;
 	bmfile->Mark(CONSOLE_INP);
@@ -195,17 +195,23 @@ OpenFile *PCB::Open(char *name)
 
 	return new OpenFile(fileDescriptor);
 }
-OpenFile *PCB::Open(char *name, int type)
+OpenFile* PCB::Open(char *name, int type)
 {
-	int fileDescriptor = OpenForReadWrite(name, FALSE);
-
-	if (fileDescriptor == -1)
-	{
+	OpenFile* f = kernel->fileSystem->Open(name);
+	if(f == NULL)
 		return NULL;
-	}
+	f->type = type;
+	return f;
+	// int fileDescriptor = OpenForReadWrite(name, FALSE);
 
-	//index++;
-	return new OpenFile(fileDescriptor, type);
+	// if (fileDescriptor == -1)
+	// {
+	// 	cout << "Open file error" << endl;
+	// 	return NULL;
+	// }
+	
+	// //index++;
+	// return new OpenFile(fileDescriptor, type);
 }
 bool PCB::Remove(char *name)
 {

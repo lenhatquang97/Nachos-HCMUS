@@ -88,7 +88,7 @@ void CreateFileSC()
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if (!kernel->fileSystem->Create(tempWrite, 0))
+  if (!kernel->fileSystem->Create(tempWrite,0))
   {
     delete[] tempWrite;
     kernel->machine->WriteRegister(2, -1);
@@ -121,11 +121,17 @@ void OpenSC()
       delete[] tempWrite;
       return;
     }
-    else if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[freeSlot] = pTab->GetPCB(kernel->currentThread->processID)->Open(tempWrite, type)) != NULL)
+    else
     {
-      kernel->machine->WriteRegister(2, freeSlot); //tra ve OpenFileID
-      delete[] tempWrite;
-      return;
+      OpenFile *openFile = pTab->GetPCB(kernel->currentThread->processID)->Open(tempWrite, type);
+      if (openFile != NULL)
+      {
+        openFile->type = type;
+        pTab->GetPCB(kernel->currentThread->processID)->fileTable[freeSlot] = openFile;
+        kernel->machine->WriteRegister(2, freeSlot); //tra ve OpenFileID
+        delete[] tempWrite;
+        return;
+      }
     }
   }
   kernel->machine->WriteRegister(2, -1);
@@ -214,7 +220,7 @@ void WriteSC()
   int OldPos;
   int NewPos;
   char *buf;
-  buf = User2System(virtAddr, charcount);   
+  buf = User2System(virtAddr, charcount);
   // Kiem tra id cua file truyen vao co nam ngoai bang mo ta file khong
   if (id < 0 || id > 9)
   {
@@ -236,7 +242,7 @@ void WriteSC()
     return;
   }
   OldPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
-                                                 // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
+                                                                                           // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
   //Xet truong hop ghi file read & write (type quy uoc la 0) thi tra ve so byte thuc su
   if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1)
   {
