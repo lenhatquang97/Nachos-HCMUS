@@ -2,6 +2,8 @@
 #define PCB_H
 
 #define MAX_FILE 10
+#define CONSOLE_INP 0
+#define CONSOLE_OUT 1
 #include "thread.h"
 #include "synch.h"
 class Semaphore;

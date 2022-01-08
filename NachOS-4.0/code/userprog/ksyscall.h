@@ -270,6 +270,7 @@ void ExecSC()
   int virtAddr;
   virtAddr = kernel->machine->ReadRegister(4); // doc dia chi ten chuong trinh tu thanh ghi r4
   char *name;
+  
   name = User2System(virtAddr, 255);
   if (name == NULL)
   {
@@ -282,20 +283,21 @@ void ExecSC()
   OpenFile *oFile = kernel->fileSystem->Open(name);
   if (oFile == NULL)
   {
+    DEBUG('a', "Huhu\n");
     printf("\nExec:: Can't open this file.");
     kernel->machine->WriteRegister(2, -1);
     increasePC();
     return;
   }
+  DEBUG('a', "Thank god\n");
 
   delete oFile;
-
+  
   // Return child process id
   int id = pTab->ExecUpdate(name);
   kernel->machine->WriteRegister(2, id);
 
   delete[] name;
-  increasePC();
   return;
 }
 void JoinSC()

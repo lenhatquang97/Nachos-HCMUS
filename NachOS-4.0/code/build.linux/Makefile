@@ -202,7 +202,7 @@ DEFINES =  -DFILESYS_STUB -DRDATA -DSIM_FIX
 
 # -fsanitize=address to check for memory leaks
 CFLAGS = -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -m32 -fsanitize=address
-LDFLAGS = -m32 -fsanitize=address 
+LDFLAGS = -m32 -fsanitize=address
 CPP_AS_FLAGS= -m32 -fsanitize=address
 
 #####################################################################

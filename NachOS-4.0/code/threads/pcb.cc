@@ -9,7 +9,9 @@ PCB::PCB(int id)
 	this->multex = new Semaphore("multex", 1);
 
 	this->numwait = this->exitcode = this->boolBG = 0;
+
 	this->thread = NULL;
+	this->bmfile = new Bitmap(MAX_FILE);
 	this->pid = id;
 
 	if (id <= 0)
@@ -17,23 +19,23 @@ PCB::PCB(int id)
 	else
 		this->parentID = kernel->currentThread->processID;
 
-	this->bmfile = new Bitmap(MAX_FILE);
 
 	this->fileTable = new OpenFile *[MAX_FILE];
-	fileIdx = 0;
+	this->fileIdx = 0;
 	for (int i = 0; i < 10; ++i)
 	{
 		fileTable[i] = NULL;
 	}
+
 	kernel->fileSystem->Create("stdout", 0);
-	fileTable[3] = kernel->fileSystem->Open("stdout");
-	fileTable[3]->type = 0;
-	bmfile->Mark(3);
+	fileTable[CONSOLE_OUT] = kernel->fileSystem->Open("stdout");
+	fileTable[CONSOLE_OUT]->type = 0;
+	bmfile->Mark(CONSOLE_OUT);
 
 	kernel->fileSystem->Create("stdin", 0);
-	fileTable[2] = kernel->fileSystem->Open("stdin");
-	fileTable[2]->type = 1;
-	bmfile->Mark(2);
+	fileTable[CONSOLE_INP] = kernel->fileSystem->Open("stdin");
+	fileTable[CONSOLE_INP]->type = 1;
+	bmfile->Mark(CONSOLE_INP);
 }
 
 PCB::~PCB()
@@ -59,23 +61,29 @@ PCB::~PCB()
 	delete[] fileTable;
 }
 
-void StartProcess_2(void *id)
+void StartProcess_2(void *pid)
 {
 	// Lay fileName cua process id nay
+	int id = *((int*)pid);
+	printf("%d\n", id);
 	char *fileName = pTab->GetFileName((int)id);
-
 	AddrSpace *space;
 	space = new AddrSpace(fileName);
+	if (space == NULL)
+	{
+		printf("\nPCB::Exec: Can't create AddSpace.");
+		return;
+	}
 
-	if (space->Load(fileName))
-    {
-        space->Execute();
-        ASSERTNOTREACHED();
-    }
-    printf("\nCan't create %s addrspace.", fileName);
- 
-    if (space != NULL)
-        delete space;
+	kernel->currentThread->space = space;
+
+	space->InitRegisters(); // set the initial register values
+	space->RestoreState();	// load page table register
+
+	kernel->machine->Run(); // jump to the user progam
+	ASSERT(FALSE);	// machine->Run never returns;
+					// the address space exits
+					// by doing the syscall "exit"
 }
 
 int PCB::Exec(char *filename, int id)
@@ -92,13 +100,13 @@ int PCB::Exec(char *filename, int id)
 		multex->V();
 		return -1;
 	}
-
 	//  Đặt processID của thread này là id.
 	this->thread->processID = id;
 	// Đặt parrentID của thread này là processID của thread gọi thực thi Exec
 	this->parentID = kernel->currentThread->processID;
 	// Gọi thực thi Fork(StartProcess_2,id) => Ta cast thread thành kiểu int, sau đó khi xử ký hàm StartProcess ta cast Thread về đúng kiểu của nó.
-	this->thread->Fork((VoidFunctionPtr)StartProcess_2, &id); // StartProcess_2 : void Func(void* Args)
+	printf("\nThread %d is created.\n", id);
+	this->thread->Fork(StartProcess_2, &id); // StartProcess_2 : void Func(void* Args)
 
 	multex->V();
 	// Trả về id.
@@ -161,16 +169,18 @@ void PCB::DecNumWait()
 }
 
 void PCB::SetFileName(char *fn) { strcpy(FileName, fn); }
-char *PCB::GetFileName() { 
-	if(thread != NULL){
+char *PCB::GetFileName()
+{
+	if (thread != NULL)
+	{
 		return this->FileName;
-	}	 
+	}
 	return NULL;
 }
 
 bool PCB::IsExist(int id)
 {
-    if (id < 0 || id >= MAX_FILE)
-        return false;
-    return bmfile->Test(id);
+	if (id < 0 || id >= MAX_FILE)
+		return false;
+	return bmfile->Test(id);
 }

@@ -7,8 +7,9 @@ Sem::Sem(char *na, int i)
 }
 Sem::~Sem()
 {
-	if (sem)
+	if (sem){
 		delete sem;
+	}
 }
 void Sem::wait()
 {

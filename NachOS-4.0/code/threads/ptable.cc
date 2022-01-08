@@ -26,25 +26,25 @@ PTable::PTable(int size)
 
 PTable::~PTable()
 {
-    if( bm != 0 )
-	delete bm;
+    if( bm != 0 ){
+		delete bm;
+	}
+	
     
     For(i,0,psize){
 		if(pcb[i] != 0)
 			delete pcb[i];
     }
 		
-	if( bmsem != 0)
+	if( bmsem != 0){
 		delete bmsem;
+	}
 }
 
 int PTable::ExecUpdate(char* name)
 {
-
-
     //Gọi mutex->P(); để giúp tránh tình trạng nạp 2 tiến trình cùng 1 lúc.
 	bmsem->P();
-	
 	// Kiểm tra tính hợp lệ của chương trình “name”.
         // Kiểm tra sự tồn tại của chương trình “name” bằng cách gọi phương thức Open của lớp fileSystem.
 	if(name == NULL)
@@ -60,10 +60,8 @@ int PTable::ExecUpdate(char* name)
 		bmsem->V();
 		return -1;
 	}
-
 	// Tìm slot trống trong bảng Ptable.
 	int index = this->GetFreeSlot();
-
     // Check if have free slot
 	if(index < 0)
 	{
@@ -71,20 +69,17 @@ int PTable::ExecUpdate(char* name)
 		bmsem->V();
 		return -1;
 	}
-
+	
 	//Nếu có slot trống thì khởi tạo một PCB mới với processID chính là index của slot này
 	pcb[index] = new PCB(index);
 	pcb[index]->SetFileName(name);
-
 	// parrentID là processID của currentThread
-    	pcb[index]->parentID = kernel->currentThread->processID;
-
-	
+    pcb[index]->parentID = kernel->currentThread->processID;
 	// Gọi thực thi phương thức Exec của lớp PCB.
 	int pid = pcb[index]->Exec(name,index);
-
+	printf("\npid: %d\n",pid);
 	// Gọi bmsem->V()
-	bmsem->V();
+	bmsem->V(); 
 	// Trả về kết quả thực thi của PCB->Exec.
 	return pid;
 }
