@@ -105,26 +105,27 @@ void OpenSC()
   bufferWrite = kernel->machine->ReadRegister(4);
   type = (int)kernel->machine->ReadRegister(5);
   tempWrite = User2System(bufferWrite, 255);
-  int freeSlot = pTab->GetPCB(0)->FindFreeSlot();  
+  int freeSlot = pTab->GetPCB(kernel->currentThread->processID)->FindFreeSlot();
   if (freeSlot != -1)
   {
-    if (type == 0 || type == 1)
+
+    if (strcmp(tempWrite, "stdin") == 0 && type == 0)
     {
-      if ((pTab->GetPCB(0)->fileTable[freeSlot] = pTab->GetPCB(0)->Open(tempWrite, type)) != NULL)
-      {
-        kernel->machine->WriteRegister(2, freeSlot); //tra ve OpenFileID
-        delete[] tempWrite;
-      }
-      else if (type == 2) // xu li stdin voi type quy uoc la 2
-      {
-        kernel->machine->WriteRegister(2, 0); //tra ve OpenFileID
-        delete[] tempWrite;
-      }
-      else // xu li stdout voi type quy uoc la 3
-      {
-        kernel->machine->WriteRegister(2, 1); //tra ve OpenFileID
-        delete[] tempWrite;
-      }
+      kernel->machine->WriteRegister(2, 0);
+      delete[] tempWrite;
+      return;
+    }
+    else if (strcmp(tempWrite, "stdout") == 0 && type == 1) // xu li stdin voi type quy uoc la 1
+    {
+      kernel->machine->WriteRegister(2, 1); //tra ve OpenFileID
+      delete[] tempWrite;
+      return;
+    }
+    else if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[freeSlot] = pTab->GetPCB(kernel->currentThread->processID)->Open(tempWrite, type)) != NULL)
+    {
+      kernel->machine->WriteRegister(2, freeSlot); //tra ve OpenFileID
+      delete[] tempWrite;
+      return;
     }
   }
   kernel->machine->WriteRegister(2, -1);
@@ -132,12 +133,12 @@ void OpenSC()
 void CloseSC()
 {
   OpenFileId fid = kernel->machine->ReadRegister(4);
-  if (fid >= 0 && fid <= 14) //Chi xu li khi fid nam trong [0, 14]
+  if (fid >= 0 && fid <= 9) //Chi xu li khi fid nam trong [0, 9]
   {
-    if (pTab->GetPCB(0)->fileTable[fid]) //neu mo file thanh cong
+    if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[fid]) //neu mo file thanh cong
     {
-      delete pTab->GetPCB(0)->fileTable[fid]; //Xoa vung nho luu tru file
-      pTab->GetPCB(0)->fileTable[fid] = NULL; //Gan vung nho NULL
+      delete pTab->GetPCB(kernel->currentThread->processID)->fileTable[fid]; //Xoa vung nho luu tru file
+      pTab->GetPCB(kernel->currentThread->processID)->fileTable[fid] = NULL; //Gan vung nho NULL
       kernel->machine->WriteRegister(2, 0);
     }
   }
@@ -151,30 +152,30 @@ void ReadSC()
   int OldPos;
   int NewPos;
   char *buf;
+  buf = User2System(virtAddr, charcount);
   // Kiem tra id cua file truyen vao co nam ngoai bang mo ta file khong
-  if (id < 0 || id > 14)
+  if (id < 0 || id > 9)
   {
     printf("\nKhong the read vi id nam ngoai bang mo ta file.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
   // Kiem tra file co ton tai khong
-  if (pTab->GetPCB(0)->fileTable[id] == NULL)
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id] == NULL)
   {
     printf("\nKhong the read vi file nay khong ton tai.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if (pTab->GetPCB(0)->fileTable[id]->type == 3) // Xet truong hop doc file stdout (type quy uoc la 3) thi tra ve -1
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1 && strcmp(buf, "stdout") == 0)
   {
-    printf("\nKhong the read file stdout.");
+    printf("\nKhong the read file.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  OldPos = pTab->GetPCB(0)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
-  buf = User2System(virtAddr, charcount);                  // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
-  // Xet truong hop doc file stdin (type quy uoc la 2)
-  if (pTab->GetPCB(0)->fileTable[id]->type == 2)
+  OldPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
+
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0 && strcmp(buf, "stdin") == 0)
   {
     // Su dung ham Read cua lop SynchConsole de tra ve so byte thuc su doc duoc
     //int size = gSynchConsole->Read(buf, charcount);
@@ -184,10 +185,10 @@ void ReadSC()
     return;
   }
   // Xet truong hop doc file binh thuong thi tra ve so byte thuc su
-  if ((pTab->GetPCB(0)->fileTable[id]->Read(buf, charcount)) > 0)
+  if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->Read(buf, charcount)) > 0)
   {
     // So byte thuc su = NewPos - OldPos
-    NewPos = pTab->GetPCB(0)->fileTable[id]->GetCurrentPos();
+    NewPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
     // Copy chuoi tu vung nho System Space sang User Space voi bo dem buffer co do dai la so byte thuc su
     System2User(virtAddr, NewPos - OldPos, buf);
     kernel->machine->WriteRegister(2, NewPos - OldPos);
@@ -213,40 +214,41 @@ void WriteSC()
   int OldPos;
   int NewPos;
   char *buf;
+  buf = User2System(virtAddr, charcount);   
   // Kiem tra id cua file truyen vao co nam ngoai bang mo ta file khong
-  if (id < 0 || id > 14)
+  if (id < 0 || id > 9)
   {
     printf("\nKhong the write vi id nam ngoai bang mo ta file.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
   // Kiem tra file co ton tai khong
-  if (pTab->GetPCB(0)->fileTable[id] == NULL)
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id] == NULL)
   {
     printf("\nKhong the write vi file nay khong ton tai.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if (pTab->GetPCB(0)->fileTable[id]->type == 1 || pTab->GetPCB(0)->fileTable[id]->type == 2)
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0)
   {
     printf("\nKhong the write file stdin hoac file only read.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  OldPos = pTab->GetPCB(0)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
-  buf = User2System(virtAddr, charcount);                  // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
+  OldPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
+                                                 // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
   //Xet truong hop ghi file read & write (type quy uoc la 0) thi tra ve so byte thuc su
-  if (pTab->GetPCB(0)->fileTable[id]->type == 0)
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1)
   {
-    if ((pTab->GetPCB(0)->fileTable[id]->Write(buf, charcount)) > 0)
+    if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->Write(buf, charcount)) > 0)
     {
       // So byte thuc su = NewPos - OldPos
-      NewPos = pTab->GetPCB(0)->fileTable[id]->GetCurrentPos();
+      NewPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
       kernel->machine->WriteRegister(2, NewPos - OldPos);
       delete buf;
       return;
     }
-    if (pTab->GetPCB(0)->fileTable[id]->type == 3) // Xet truong hop con lai ghi file stdout (type quy uoc la 3)
+    if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1)
     {
       int i = 0;
       while (buf[i] != 0 && buf[i] != '\n') // Vong lap de write den khi gap ky tu '\n'
@@ -269,7 +271,7 @@ void ExecSC()
   int virtAddr;
   virtAddr = kernel->machine->ReadRegister(4); // doc dia chi ten chuong trinh tu thanh ghi r4
   char *name;
-  
+
   name = User2System(virtAddr, 255);
   if (name == NULL)
   {
@@ -279,7 +281,7 @@ void ExecSC()
     //IncreasePC();
     return;
   }
-  OpenFile *oFile = pTab->GetPCB(0)->Open(name);
+  OpenFile *oFile = pTab->GetPCB(kernel->currentThread->processID)->Open(name);
   if (oFile == NULL)
   {
     DEBUG('a', "Huhu\n");
@@ -291,7 +293,7 @@ void ExecSC()
   DEBUG('a', "Thank god\n");
 
   delete oFile;
-  
+
   // Return child process id
   int id = pTab->ExecUpdate(name);
   kernel->machine->WriteRegister(2, id);

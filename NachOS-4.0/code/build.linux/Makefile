@@ -201,9 +201,9 @@ DEFINES =  -DFILESYS_STUB -DRDATA -DSIM_FIX
 # you need to call some inline functions from the debugger.
 
 # -fsanitize=address to check for memory leaks
-CFLAGS = -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -m32
-LDFLAGS = -m32
-CPP_AS_FLAGS= -m32
+CFLAGS = -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -m32 -fsanitize=address
+LDFLAGS = -m32 -fsanitize=address
+CPP_AS_FLAGS= -m32 -fsanitize=address
 
 #####################################################################
 CPP=/lib/cpp

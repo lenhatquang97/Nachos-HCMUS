@@ -243,7 +243,7 @@ ExceptionHandler(ExceptionType which)
 						if(tempRead[i] == '\n') {
 							tempRead[i+1] = '\0'; break;
 						}
-					}
+					} 
 					tempRead[lengthRead] = '\0';
 					//Copy tu vung nho system sang user
 					System2User(bufferRead, lengthRead, tempRead);

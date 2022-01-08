@@ -27,9 +27,7 @@ private:
 public:
     int parentID;               // ID cua tien trinh cha
     
-    char boolBG;                // Kiem tra neu la tien trinh nen
     OpenFile** fileTable;
-    int fileIdx;
     
     
     PCB(int = 0);               // Contructor

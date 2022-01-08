@@ -8,7 +8,7 @@ PCB::PCB(int id)
 	this->exitsem = new Semaphore("exitsem", 0);
 	this->multex = new Semaphore("multex", 1);
 
-	this->numwait = this->exitcode = this->boolBG = 0;
+	this->numwait = this->exitcode = 0;
 
 	this->thread = NULL;
 	this->bmfile = new Bitmap(MAX_FILE);
@@ -20,19 +20,18 @@ PCB::PCB(int id)
 		this->parentID = kernel->currentThread->processID;
 
 	this->fileTable = new OpenFile *[MAX_FILE];
-	this->fileIdx = 0;
 	for (int i = 0; i < 10; ++i)
 	{
 		fileTable[i] = NULL;
 	}
 
 	fileTable[CONSOLE_OUT] = kernel->fileSystem->Open("stdout");
-	fileTable[CONSOLE_OUT]->type = 0; 
+	fileTable[CONSOLE_OUT]->type = 1; 
 	bmfile->Mark(CONSOLE_OUT);
 
 	
 	fileTable[CONSOLE_INP] = kernel->fileSystem->Open("stdin");
-	fileTable[CONSOLE_INP]->type = 1;
+	fileTable[CONSOLE_INP]->type = 0;
 	bmfile->Mark(CONSOLE_INP);
 }
 
