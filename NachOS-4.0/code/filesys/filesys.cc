@@ -1,4 +1,4 @@
-// filesys.cc  
+// filesys.cc 
 //	Routines to manage the overall operation of the file system.
 //	Implements routines to map from textual file names to files.
 //
@@ -336,15 +336,5 @@ FileSystem::Print()
     delete freeMap;
     delete directory;
 } 
-
-//Ham tim slot trong
-int FileSystem::FindFreeSlot()
-{
-	for(int i = 2; i < 15; i++)
-	{
-		if(openf[i] == NULL) return i;		
-	}
-	return -1;
-}
 
 #endif // FILESYS_STUB

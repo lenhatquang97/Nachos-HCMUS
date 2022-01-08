@@ -58,6 +58,11 @@ public:
     void SetFileName(char*);    // Set ten tien trinh
     char* GetFileName();        // Tra ve ten tien trinh
     bool IsExist(int);
+
+    OpenFile *Open(char *name);	
+    OpenFile *Open(char *name, int type);
+    bool Remove(char *name);
+    
 };
 
 #endif // PCB_H

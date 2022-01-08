@@ -3,7 +3,7 @@
 
 #define For(i,a,b) for (int i = (a); i < b; ++i)
 
-PTable::PTable(int size)
+PTable::PTable(int size) 
 {
 
     if (size < 0)

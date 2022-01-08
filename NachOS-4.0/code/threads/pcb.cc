@@ -1,7 +1,7 @@
 #include "main.h"
 #include "pcb.h"
+#include "directory.h"
 //extern void StartProcess_2(int id);
-
 PCB::PCB(int id)
 {
 	this->joinsem = new Semaphore("joinsem", 0);
@@ -19,7 +19,6 @@ PCB::PCB(int id)
 	else
 		this->parentID = kernel->currentThread->processID;
 
-
 	this->fileTable = new OpenFile *[MAX_FILE];
 	this->fileIdx = 0;
 	for (int i = 0; i < 10; ++i)
@@ -27,12 +26,11 @@ PCB::PCB(int id)
 		fileTable[i] = NULL;
 	}
 
-	kernel->fileSystem->Create("stdout", 0);
 	fileTable[CONSOLE_OUT] = kernel->fileSystem->Open("stdout");
-	fileTable[CONSOLE_OUT]->type = 0;
+	fileTable[CONSOLE_OUT]->type = 0; 
 	bmfile->Mark(CONSOLE_OUT);
 
-	kernel->fileSystem->Create("stdin", 0);
+	
 	fileTable[CONSOLE_INP] = kernel->fileSystem->Open("stdin");
 	fileTable[CONSOLE_INP]->type = 1;
 	bmfile->Mark(CONSOLE_INP);
@@ -64,8 +62,8 @@ PCB::~PCB()
 void StartProcess_2(void *pid)
 {
 	// Lay fileName cua process id nay
-	int id = *((int*)pid);
-	delete (int*)pid;
+	int id = *((int *)pid);
+	delete (int *)pid;
 	char *fileName = pTab->GetFileName((int)id);
 	AddrSpace *space;
 	space = new AddrSpace(fileName);
@@ -81,9 +79,9 @@ void StartProcess_2(void *pid)
 	space->RestoreState();	// load page table register
 
 	kernel->machine->Run(); // jump to the user progam
-	ASSERT(FALSE);	// machine->Run never returns;
-					// the address space exits
-					// by doing the syscall "exit"
+	ASSERT(FALSE);			// machine->Run never returns;
+							// the address space exits
+							// by doing the syscall "exit"
 }
 
 int PCB::Exec(char *filename, int id)
@@ -101,10 +99,10 @@ int PCB::Exec(char *filename, int id)
 		return -1;
 	}
 	//  Đặt processID của thread này là id.
-	this->thread->processID = id; 
-	
+	this->thread->processID = id;
+
 	// Đặt parrentID của thread này là processID của thread gọi thực thi Exec
-	this->parentID = kernel->currentThread->processID; 
+	this->parentID = kernel->currentThread->processID;
 	// Gọi thực thi Fork(StartProcess_2,id) => Ta cast thread thành kiểu int, sau đó khi xử ký hàm StartProcess ta cast Thread về đúng kiểu của nó.
 	printf("\nThread %d is created.\n", id);
 	void *pid = new int;
@@ -186,4 +184,31 @@ bool PCB::IsExist(int id)
 	if (id < 0 || id >= MAX_FILE)
 		return false;
 	return bmfile->Test(id);
+}
+OpenFile *PCB::Open(char *name)
+{
+	int fileDescriptor = OpenForReadWrite(name, FALSE);
+
+	if (fileDescriptor == -1)
+	{
+		return NULL;
+	}
+
+	return new OpenFile(fileDescriptor);
+}
+OpenFile *PCB::Open(char *name, int type)
+{
+	int fileDescriptor = OpenForReadWrite(name, FALSE);
+
+	if (fileDescriptor == -1)
+	{
+		return NULL;
+	}
+
+	//index++;
+	return new OpenFile(fileDescriptor, type);
+}
+bool PCB::Remove(char *name)
+{
+	return Unlink(name) == 0;
 }

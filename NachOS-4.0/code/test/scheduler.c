@@ -2,11 +2,15 @@
 
 void main()
 {
-	int id;
-	char* buffer;
-	id = Open("hello.txt",1);
-	PrintNum(id);
-	Write(buffer,255,id);
-	PrintString(buffer);
-	Close(id);
+	int hello;
+	// int pingPID, pongPID;
+	// PrintString("Ping-Pong test starting...\n\n");
+	// pingPID = Exec("./test/ping");
+	// pongPID = Exec("./test/pong");
+	// Join(pingPID);
+	// Join(pongPID);
+	hello = Open("hello.txt", 0);
+	PrintNum(hello);
+	PrintChar('\n');
+
 }

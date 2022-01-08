@@ -105,13 +105,12 @@ void OpenSC()
   bufferWrite = kernel->machine->ReadRegister(4);
   type = (int)kernel->machine->ReadRegister(5);
   tempWrite = User2System(bufferWrite, 255);
-
-  int freeSlot = kernel->fileSystem->FindFreeSlot();  
+  int freeSlot = pTab->GetPCB(0)->FindFreeSlot();  
   if (freeSlot != -1)
   {
     if (type == 0 || type == 1)
     {
-      if ((kernel->fileSystem->openf[freeSlot] = kernel->fileSystem->Open(tempWrite, type)) != NULL)
+      if ((pTab->GetPCB(0)->fileTable[freeSlot] = pTab->GetPCB(0)->Open(tempWrite, type)) != NULL)
       {
         kernel->machine->WriteRegister(2, freeSlot); //tra ve OpenFileID
         delete[] tempWrite;
@@ -135,10 +134,10 @@ void CloseSC()
   OpenFileId fid = kernel->machine->ReadRegister(4);
   if (fid >= 0 && fid <= 14) //Chi xu li khi fid nam trong [0, 14]
   {
-    if (kernel->fileSystem->openf[fid]) //neu mo file thanh cong
+    if (pTab->GetPCB(0)->fileTable[fid]) //neu mo file thanh cong
     {
-      delete kernel->fileSystem->openf[fid]; //Xoa vung nho luu tru file
-      kernel->fileSystem->openf[fid] = NULL; //Gan vung nho NULL
+      delete pTab->GetPCB(0)->fileTable[fid]; //Xoa vung nho luu tru file
+      pTab->GetPCB(0)->fileTable[fid] = NULL; //Gan vung nho NULL
       kernel->machine->WriteRegister(2, 0);
     }
   }
@@ -160,22 +159,22 @@ void ReadSC()
     return;
   }
   // Kiem tra file co ton tai khong
-  if (kernel->fileSystem->openf[id] == NULL)
+  if (pTab->GetPCB(0)->fileTable[id] == NULL)
   {
     printf("\nKhong the read vi file nay khong ton tai.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if (kernel->fileSystem->openf[id]->type == 3) // Xet truong hop doc file stdout (type quy uoc la 3) thi tra ve -1
+  if (pTab->GetPCB(0)->fileTable[id]->type == 3) // Xet truong hop doc file stdout (type quy uoc la 3) thi tra ve -1
   {
     printf("\nKhong the read file stdout.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  OldPos = kernel->fileSystem->openf[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
+  OldPos = pTab->GetPCB(0)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
   buf = User2System(virtAddr, charcount);                  // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
   // Xet truong hop doc file stdin (type quy uoc la 2)
-  if (kernel->fileSystem->openf[id]->type == 2)
+  if (pTab->GetPCB(0)->fileTable[id]->type == 2)
   {
     // Su dung ham Read cua lop SynchConsole de tra ve so byte thuc su doc duoc
     //int size = gSynchConsole->Read(buf, charcount);
@@ -185,10 +184,10 @@ void ReadSC()
     return;
   }
   // Xet truong hop doc file binh thuong thi tra ve so byte thuc su
-  if ((kernel->fileSystem->openf[id]->Read(buf, charcount)) > 0)
+  if ((pTab->GetPCB(0)->fileTable[id]->Read(buf, charcount)) > 0)
   {
     // So byte thuc su = NewPos - OldPos
-    NewPos = kernel->fileSystem->openf[id]->GetCurrentPos();
+    NewPos = pTab->GetPCB(0)->fileTable[id]->GetCurrentPos();
     // Copy chuoi tu vung nho System Space sang User Space voi bo dem buffer co do dai la so byte thuc su
     System2User(virtAddr, NewPos - OldPos, buf);
     kernel->machine->WriteRegister(2, NewPos - OldPos);
@@ -222,32 +221,32 @@ void WriteSC()
     return;
   }
   // Kiem tra file co ton tai khong
-  if (kernel->fileSystem->openf[id] == NULL)
+  if (pTab->GetPCB(0)->fileTable[id] == NULL)
   {
     printf("\nKhong the write vi file nay khong ton tai.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if (kernel->fileSystem->openf[id]->type == 1 || kernel->fileSystem->openf[id]->type == 2)
+  if (pTab->GetPCB(0)->fileTable[id]->type == 1 || pTab->GetPCB(0)->fileTable[id]->type == 2)
   {
     printf("\nKhong the write file stdin hoac file only read.");
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  OldPos = kernel->fileSystem->openf[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
+  OldPos = pTab->GetPCB(0)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
   buf = User2System(virtAddr, charcount);                  // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
   //Xet truong hop ghi file read & write (type quy uoc la 0) thi tra ve so byte thuc su
-  if (kernel->fileSystem->openf[id]->type == 0)
+  if (pTab->GetPCB(0)->fileTable[id]->type == 0)
   {
-    if ((kernel->fileSystem->openf[id]->Write(buf, charcount)) > 0)
+    if ((pTab->GetPCB(0)->fileTable[id]->Write(buf, charcount)) > 0)
     {
       // So byte thuc su = NewPos - OldPos
-      NewPos = kernel->fileSystem->openf[id]->GetCurrentPos();
+      NewPos = pTab->GetPCB(0)->fileTable[id]->GetCurrentPos();
       kernel->machine->WriteRegister(2, NewPos - OldPos);
       delete buf;
       return;
     }
-    if (kernel->fileSystem->openf[id]->type == 3) // Xet truong hop con lai ghi file stdout (type quy uoc la 3)
+    if (pTab->GetPCB(0)->fileTable[id]->type == 3) // Xet truong hop con lai ghi file stdout (type quy uoc la 3)
     {
       int i = 0;
       while (buf[i] != 0 && buf[i] != '\n') // Vong lap de write den khi gap ky tu '\n'
@@ -280,7 +279,7 @@ void ExecSC()
     //IncreasePC();
     return;
   }
-  OpenFile *oFile = kernel->fileSystem->Open(name);
+  OpenFile *oFile = pTab->GetPCB(0)->Open(name);
   if (oFile == NULL)
   {
     DEBUG('a', "Huhu\n");
