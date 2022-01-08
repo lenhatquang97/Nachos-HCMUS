@@ -64,7 +64,7 @@ PCB::~PCB()
 void StartProcess_2(void *pid)
 {
 	// Lay fileName cua process id nay
-	int id = *((int*)pid);
+	int id = ((int)pid);
 	printf("%d\n", id);
 	char *fileName = pTab->GetFileName((int)id);
 	AddrSpace *space;

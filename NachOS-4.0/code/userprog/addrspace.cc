@@ -197,6 +197,7 @@ AddrSpace::AddrSpace(char *filename)
         numPages = 0;
         delete executable;
         addrLock->V();
+        return;
     }
 
     DEBUG('a', ("Initializing address space, num pages %d, size %d\n",
@@ -215,6 +216,8 @@ AddrSpace::AddrSpace(char *filename)
                                        // a separate page, we could set its
                                        // pages to be read-only
         printf("Physic Pages %d \n", pageTable[i].physicalPage);
+        bzero(&(kernel->machine->mainMemory[pageTable[i].physicalPage*PageSize]), PageSize);
+        printf("phyPage %d \n",pageTable[i].physicalPage);
     }
 
     addrLock->V();
