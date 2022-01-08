@@ -105,7 +105,8 @@ void OpenSC()
   bufferWrite = kernel->machine->ReadRegister(4);
   type = (int)kernel->machine->ReadRegister(5);
   tempWrite = User2System(bufferWrite, 255);
-  int freeSlot = kernel->fileSystem->FindFreeSlot();
+
+  int freeSlot = kernel->fileSystem->FindFreeSlot();  
   if (freeSlot != -1)
   {
     if (type == 0 || type == 1)
@@ -128,7 +129,6 @@ void OpenSC()
     }
   }
   kernel->machine->WriteRegister(2, -1);
-  delete[] tempWrite;
 }
 void CloseSC()
 {

@@ -1,10 +1,9 @@
 #include "syscall.h"
 int main(){
     int i;
-    PrintString("Decimal\tCharacter\n");
+    PrintString("Decimal\t\tCharacter\n\n");
     for(i = 32; i < 128; ++i) {
-        PrintNum(i); PrintString("\t");
-        PrintChar(i); PrintString("\n");
+        PrintNum(i); PrintString("\t\t");
+        PrintChar(i); PrintString("\n\n");
     }
-    Halt();
 }

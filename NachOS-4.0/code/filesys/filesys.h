@@ -45,7 +45,19 @@ class FileSystem
 public:
 	OpenFile **openf; //De kiem tra xem file co dang mo khong
 	int index;
-	FileSystem() {}
+	FileSystem()
+	{
+		openf = new OpenFile *[15];
+		index = 0;
+		for (int i = 0; i < 15; ++i)
+		{
+			openf[i] = NULL;
+		}
+		this->Create("stdin", 0);
+		this->Create("stdout", 0);
+		openf[index++] = this->Open("stdin", 2);
+		openf[index++] = this->Open("stdout", 3);
+	}
 	FileSystem(bool format)
 	{
 		openf = new OpenFile *[15];
@@ -65,8 +77,10 @@ public:
 	{
 		for (int i = 0; i < 15; ++i)
 		{
-			if (openf[i] != NULL)
+			if (openf[i] != NULL){
 				delete openf[i];
+			}
+				
 		}
 		delete[] openf;
 	}
@@ -74,8 +88,10 @@ public:
 	{
 		int fileDescriptor = OpenForWrite(name);
 
-		if (fileDescriptor == -1)
+		if (fileDescriptor == -1){
 			return FALSE;
+		}
+			
 		Close(fileDescriptor);
 		return TRUE;
 	}
@@ -94,8 +110,10 @@ public:
 	{
 		int fileDescriptor = OpenForReadWrite(name, FALSE);
 
-		if (fileDescriptor == -1)
+		if (fileDescriptor == -1){
 			return NULL;
+		}
+			
 		return new OpenFile(fileDescriptor);
 	}
 
@@ -103,8 +121,10 @@ public:
 	{
 		int fileDescriptor = OpenForReadWrite(name, FALSE);
 
-		if (fileDescriptor == -1)
+		if (fileDescriptor == -1){
 			return NULL;
+		}
+			
 		//index++;
 		return new OpenFile(fileDescriptor, type);
 	}
@@ -114,8 +134,11 @@ public:
 	{
 		for (int i = 2; i < 15; i++)
 		{
-			if (openf[i] == NULL)
+			printf("%d\n", i);
+			if (openf[i] == NULL){
 				return i;
+			}
+				
 		}
 		return -1;
 	}
