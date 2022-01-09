@@ -309,7 +309,7 @@ int main(int argc, char **argv)
     }
     if (dirListFlag)
     {
-        kernel->fileSystem->List();
+        kernel->fileSystem->List(); 
     }
     if (printFileName != NULL)
     {
@@ -320,7 +320,7 @@ int main(int argc, char **argv)
     // finally, run an initial user program if requested to do so
     if (userProgName != NULL)
     {
-        AddrSpace *space = new AddrSpace(); 
+        AddrSpace *space = new AddrSpace(userProgName); 
         ASSERT(space != (AddrSpace *)NULL);
         if (space->Load(userProgName))
         {                       // load the program into the space

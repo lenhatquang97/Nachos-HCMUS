@@ -52,6 +52,7 @@ int main()
 	SLTD = 0;
 	while(1)
 	{
+		PrintString("Ayyo come\n");
 		Read(&c_readFile, 1, si_input);
 		if(c_readFile != '\n')
 		{
@@ -63,7 +64,7 @@ int main()
 	}
 
 
-	// Goi thuc thi tien trinh sinhvien.c
+	// // Goi thuc thi tien trinh sinhvien.c
 	f_Success = Exec("./test/sinhvien");
 	if(f_Success == -1)
 	{
@@ -116,33 +117,33 @@ int main()
 			
 		Signal("sinhvien");
 
-		Wait("main");	
+		// Wait("main");	
 		
-		si_result = Open("result.txt", 1);
-		if(si_result == -1)
-		{
-			Close(si_input);
-			Close(si_output);
-			return 1;
-		}
+		// si_result = Open("result.txt", 1);
+		// if(si_result == -1)
+		// {
+		// 	Close(si_input);
+		// 	Close(si_output);
+		// 	return 1;
+		// }
 
-		PrintString("\n Lan thu: ");
-		PrintNum(SLTD);
-		PrintString("\n");	
+		// PrintString("\n Lan thu: ");
+		// PrintNum(SLTD);
+		// PrintString("\n");	
 
-		while(1)
-		{
-			if(Read(&c_readFile, 1, si_result)  < 1)
-			{
-				Write("\r\n", 2, si_output);
-				Close(si_result);
-				Signal("m_vn");
-				break;
-			}
-			Write(&c_readFile, 1, si_output);
-			Write(" ", 1, si_output);
+		// while(1)
+		// {
+		// 	if(Read(&c_readFile, 1, si_result)  < 1)
+		// 	{
+		// 		Write("\r\n", 2, si_output);
+		// 		Close(si_result);
+		// 		Signal("m_vn");
+		// 		break;
+		// 	}
+		// 	Write(&c_readFile, 1, si_output);
+		// 	Write(" ", 1, si_output);
 			
-		}
+		// }
 		
 	}
 	

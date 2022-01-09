@@ -297,13 +297,14 @@ void ExecSC()
     return;
   }
   DEBUG('a', "Thank god\n");
-
+  
   delete oFile;
-
+  
   // Return child process id
+  printf("\nExec:: Child process id: %d", kernel->currentThread->processID);
   int id = pTab->ExecUpdate(name);
   kernel->machine->WriteRegister(2, id);
-
+  
   delete[] name;
   return;
 }
@@ -368,7 +369,7 @@ void CreateSemaphoreSC()
   }
   delete[] name;
   kernel->machine->WriteRegister(2, res);
-  printf("Ayyo wtf");
+  //increasePC();
   return;
 }
 void WaitSC()
@@ -419,8 +420,9 @@ void SignalSC()
     return;
   }
 
+  printf("\n SignalSC:: name: %s", name);
   int res = semTab->Signal(name);
-
+  printf("\n WTF %s", name);
   if (res == -1)
   {
     DEBUG('a', "\n Khong ton tai ten semaphore nay!");

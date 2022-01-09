@@ -65,7 +65,7 @@ void StartProcess_2(void *pid)
 	delete (int *)pid;
 	char *fileName = pTab->GetFileName((int)id);
 	AddrSpace *space;
-	space = new AddrSpace();
+	space = new AddrSpace(fileName); 
 	if (space == NULL)
 	{
 		printf("\nPCB::Exec: Can't create AddSpace.");
