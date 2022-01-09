@@ -476,5 +476,9 @@ void SeekSC()
   }
   return;
 }
+void CurrentThreadIDSC(){
+  kernel->machine->WriteRegister(2, kernel->currentThread->processID);
+  return;
+}
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */

@@ -386,6 +386,13 @@ void ExceptionHandler(ExceptionType which)
 
 			ASSERTNOTREACHED();
 			break;
+		case SC_CurrentThreadId:
+			CurrentThreadIDSC();
+			increasePC();
+			return;
+
+			ASSERTNOTREACHED();
+			break;
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";

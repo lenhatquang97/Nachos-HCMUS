@@ -56,6 +56,7 @@
 #define SC_CreateSemaphore 16
 #define SC_Wait 17
 #define SC_Signal 18
+#define SC_CurrentThreadId 19
 //Fourth
 
 
@@ -225,6 +226,8 @@ int CreateSemaphore(char* name, int semval);
 int Wait(char* name);
 
 int Signal(char* name);
+
+int CurrentThreadId();
 
 #endif /* IN_ASM */
 

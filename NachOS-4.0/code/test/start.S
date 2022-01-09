@@ -258,6 +258,15 @@ Signal:
 	j 	$31
 	.end Signal
 
+	.globl CurrentThreadId
+	.ent    CurrentThreadId
+CurrentThreadId:
+	addiu $2, $0, SC_CurrentThreadId
+	syscall
+	j 	$31
+	.end CurrentThreadId
+
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main
