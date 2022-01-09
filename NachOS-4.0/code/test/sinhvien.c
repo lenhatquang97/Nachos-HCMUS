@@ -13,6 +13,13 @@ void main()
 	int i_File;		// Luu con tro file
 	//-----------------------------------------------------------
 	Signal("m_vn");	
+	// Tao file result.txt de ghi voi nao su dung
+		f_Success = CreateFile("result.txt");
+		if(f_Success == -1)
+		{
+			Signal("main"); // tro ve tien trinh chinh
+			return;
+		}
 
 	while(1)
 	{
@@ -111,6 +118,7 @@ void main()
 							
 		}				
 		// Ket thuc tien trinh sinhvien va voinuoc quay lai ham SvVn
+		Close(si_sinhvien);
 		Signal("main");			
 	}
 	// Quay lai ham Svvn	
