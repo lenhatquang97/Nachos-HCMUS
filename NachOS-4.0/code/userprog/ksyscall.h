@@ -88,7 +88,7 @@ void CreateFileSC()
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if (!kernel->fileSystem->Create(tempWrite,0))
+  if (!kernel->fileSystem->Create(tempWrite, 0))
   {
     delete[] tempWrite;
     kernel->machine->WriteRegister(2, -1);
@@ -297,9 +297,9 @@ void ExecSC()
     return;
   }
   DEBUG('a', "Thank god\n");
-  
+
   delete oFile;
-  
+
   // Return child process id
   int id = pTab->ExecUpdate(name);
   kernel->machine->WriteRegister(2, id);
@@ -356,7 +356,7 @@ void CreateSemaphoreSC()
   }
 
   int res = semTab->Create(name, semval);
-  
+
   if (res == -1)
   {
     DEBUG('a', "\n Khong the khoi tao semaphore");
@@ -434,6 +434,46 @@ void SignalSC()
   delete[] name;
   kernel->machine->WriteRegister(2, res);
   //increasePC();
+  return;
+}
+void SeekSC()
+{
+  int pos = kernel->machine->ReadRegister(4); // Lay vi tri can chuyen con tro den trong file
+  int id = kernel->machine->ReadRegister(5);  // Lay id cua file
+  printf("\n SeekSC:: pos: %d, id: %d", pos, id);
+  // Kiem tra id cua file truyen vao co nam ngoai bang mo ta file khong
+  if (id < 0 || id > 9)
+  {
+    kernel->machine->WriteRegister(2, -1);
+    return;
+  }
+  // Kiem tra file co ton tai khong
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id] == NULL)
+  {
+    printf("\nKhong the seek vi file nay khong ton tai.");
+    kernel->machine->WriteRegister(2, -1);
+    return;
+  }
+  // Kiem tra co goi Seek tren console khong
+  if (id == 0 || id == 1)
+  {
+    printf("\nKhong the seek tren file console.");
+    kernel->machine->WriteRegister(2, -1);
+    return;
+  }
+  // Neu pos = -1 thi gan pos = Length nguoc lai thi giu nguyen pos
+  pos = (pos == -1) ? pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->Length() : pos;
+  if (pos > pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->Length() || pos < 0) // Kiem tra lai vi tri pos co hop le khong
+  {
+    printf("\nKhong the seek file den vi tri nay.");
+    kernel->machine->WriteRegister(2, -1);
+  }
+  else
+  {
+    // Neu hop le thi tra ve vi tri di chuyen thuc su trong file
+    pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->Seek(pos);
+    kernel->machine->WriteRegister(2, pos);
+  }
   return;
 }
 

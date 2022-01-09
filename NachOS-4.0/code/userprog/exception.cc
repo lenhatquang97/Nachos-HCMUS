@@ -359,7 +359,6 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 		case SC_CreateSemaphore:
-			printf("CreateSemaphore\n");
 			CreateSemaphoreSC();
 			increasePC();
 			return;
@@ -381,6 +380,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 		case SC_Seek:
+			SeekSC();
 			increasePC();
 			return;
 

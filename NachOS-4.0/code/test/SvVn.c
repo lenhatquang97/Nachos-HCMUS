@@ -14,17 +14,17 @@ int main()
 	//-----------------------------------------------------------
 
 	// Khoi tao 4 Semaphore de quan ly 3 tien trinh
-	f_Success = CreateSemaphore("main", 0);
+	f_Success = CreateSemaphore("main", 1);
 	if (f_Success == -1){
 		return 1;
 	}
-	f_Success = CreateSemaphore("sinhvien", 0);
+	f_Success = CreateSemaphore("sinhvien", 1);
 	if (f_Success == -1)
 		return 1;
-	f_Success = CreateSemaphore("voinuoc", 0);
+	f_Success = CreateSemaphore("voinuoc", 1);
 	if (f_Success == -1)
 		return 1;
-	f_Success = CreateSemaphore("m_vn", 0);
+	f_Success = CreateSemaphore("m_vn", 1);
 	if (f_Success == -1)
 		return 1;
 
