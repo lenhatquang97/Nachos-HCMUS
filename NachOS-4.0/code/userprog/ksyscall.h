@@ -109,13 +109,13 @@ void OpenSC()
   if (freeSlot != -1)
   {
 
-    if (strcmp(tempWrite, "stdin") == 0 && type == 0)
+    if (strcmp(tempWrite, "stdin") == 0 && type == 1)
     {
       kernel->machine->WriteRegister(2, 0);
       delete[] tempWrite;
       return;
     }
-    else if (strcmp(tempWrite, "stdout") == 0 && type == 1) // xu li stdin voi type quy uoc la 1
+    else if (strcmp(tempWrite, "stdout") == 0 && type == 0)
     {
       kernel->machine->WriteRegister(2, 1); //tra ve OpenFileID
       delete[] tempWrite;
@@ -173,7 +173,7 @@ void ReadSC()
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1 && strcmp(buf, "stdout") == 0)
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0 && strcmp(buf, "stdout") == 0)
   {
     printf("\nKhong the read file.");
     kernel->machine->WriteRegister(2, -1);
@@ -181,7 +181,7 @@ void ReadSC()
   }
   OldPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
 
-  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0 && strcmp(buf, "stdin") == 0)
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1 && strcmp(buf, "stdin") == 0)
   {
     // Su dung ham Read cua lop SynchConsole de tra ve so byte thuc su doc duoc
     //int size = gSynchConsole->Read(buf, charcount);
@@ -235,7 +235,7 @@ void WriteSC()
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0)
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1)
   {
     printf("\nKhong the write file stdin hoac file only read.");
     kernel->machine->WriteRegister(2, -1);
@@ -244,7 +244,7 @@ void WriteSC()
   OldPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
                                                                                            // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
   //Xet truong hop ghi file read & write (type quy uoc la 0) thi tra ve so byte thuc su
-  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1)
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0)
   {
     if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->Write(buf, charcount)) > 0)
     {
@@ -254,7 +254,7 @@ void WriteSC()
       delete buf;
       return;
     }
-    if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1)
+    if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0)
     {
       int i = 0;
       while (buf[i] != 0 && buf[i] != '\n') // Vong lap de write den khi gap ky tu '\n'

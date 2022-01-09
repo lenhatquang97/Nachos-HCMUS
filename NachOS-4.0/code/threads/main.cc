@@ -272,7 +272,7 @@ int main(int argc, char **argv)
     gPhysPageBitMap = new Bitmap(256);
 
     pTab = new PTable(10);
-
+    
     semTab = new STable();
     // define here
 

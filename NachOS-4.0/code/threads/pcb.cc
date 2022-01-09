@@ -26,12 +26,12 @@ PCB::PCB(int id)
 	}
 	kernel->fileSystem->Create("stdout",0);
 	fileTable[CONSOLE_OUT] = kernel->fileSystem->Open("stdout");
-	fileTable[CONSOLE_OUT]->type = 1; 
+	fileTable[CONSOLE_OUT]->type = 0; 
 	bmfile->Mark(CONSOLE_OUT);
 
 	kernel->fileSystem->Create("stdin",0);
 	fileTable[CONSOLE_INP] = kernel->fileSystem->Open("stdin");
-	fileTable[CONSOLE_INP]->type = 0;
+	fileTable[CONSOLE_INP]->type = 1;
 	bmfile->Mark(CONSOLE_INP);
 }
 
