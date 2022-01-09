@@ -65,7 +65,7 @@ void StartProcess_2(void *pid)
 	delete (int *)pid;
 	char *fileName = pTab->GetFileName((int)id);
 	AddrSpace *space;
-	space = new AddrSpace(fileName);
+	space = new AddrSpace();
 	if (space == NULL)
 	{
 		printf("\nPCB::Exec: Can't create AddSpace.");
@@ -79,7 +79,7 @@ void StartProcess_2(void *pid)
 
 	kernel->machine->Run(); // jump to the user progam
 	ASSERT(FALSE);			// machine->Run never returns;
-							// the address space exits
+							// the address space exits 
 							// by doing the syscall "exit"
 }
 

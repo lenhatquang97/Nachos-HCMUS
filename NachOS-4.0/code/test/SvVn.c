@@ -16,8 +16,11 @@ int main()
 
 	// Khoi tao 4 Semaphore de quan ly 3 tien trinh
 	f_Success = CreateSemaphore("main", 0);
-	if (f_Success == -1)
+	if (f_Success == -1){
+		PrintString("WTF\n");
 		return 1;
+	}
+		
 	f_Success = CreateSemaphore("sinhvien", 0);
 	if (f_Success == -1)
 		return 1;
