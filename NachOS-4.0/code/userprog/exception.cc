@@ -249,7 +249,7 @@ void ExceptionHandler(ExceptionType which)
 			if (lengthRead <= 0)
 			{
 				ExceptionHandler(AddressErrorException);
-				increasePC();
+				//increasePC();
 				return;
 			}
 			char *tempRead = new char[lengthRead + 1];
@@ -359,6 +359,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 		case SC_CreateSemaphore:
+			printf("CreateSemaphore\n");
 			CreateSemaphoreSC();
 			increasePC();
 			return;
@@ -374,6 +375,12 @@ void ExceptionHandler(ExceptionType which)
 			break;
 		case SC_Signal:
 			SignalSC();
+			increasePC();
+			return;
+
+			ASSERTNOTREACHED();
+			break;
+		case SC_Seek:
 			increasePC();
 			return;
 

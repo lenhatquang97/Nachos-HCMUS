@@ -284,7 +284,7 @@ void ExecSC()
     DEBUG('a', "\n Not enough memory in System");
     printf("\n Not enough memory in System");
     kernel->machine->WriteRegister(2, -1);
-    //IncreasePC();
+    ////increasePC();
     return;
   }
   OpenFile *oFile = pTab->GetPCB(kernel->currentThread->processID)->Open(name);
@@ -293,7 +293,7 @@ void ExecSC()
     DEBUG('a', "Huhu\n");
     printf("\nExec:: Can't open this file.");
     kernel->machine->WriteRegister(2, -1);
-    increasePC();
+    //increasePC();
     return;
   }
   DEBUG('a', "Thank god\n");
@@ -301,10 +301,9 @@ void ExecSC()
   delete oFile;
   
   // Return child process id
-  printf("\nExec:: Child process id: %d", kernel->currentThread->processID);
   int id = pTab->ExecUpdate(name);
   kernel->machine->WriteRegister(2, id);
-  
+  //increasePC();
   delete[] name;
   return;
 }
@@ -318,7 +317,7 @@ void JoinSC()
   int res = pTab->JoinUpdate(id);
 
   kernel->machine->WriteRegister(2, res);
-  increasePC();
+  //increasePC();
   return;
 }
 void ExitSC()
@@ -327,7 +326,7 @@ void ExitSC()
 
   if (exitStatus != 0)
   {
-    increasePC();
+    //increasePC();
     return;
   }
 
@@ -336,7 +335,7 @@ void ExitSC()
 
   kernel->currentThread->FreeSpace();
   kernel->currentThread->Finish();
-  increasePC();
+  //increasePC();
   return;
 }
 void CreateSemaphoreSC()
@@ -352,7 +351,7 @@ void CreateSemaphoreSC()
     printf("\n Not enough memory in System");
     kernel->machine->WriteRegister(2, -1);
     delete[] name;
-    increasePC();
+    //increasePC();
     return;
   }
 
@@ -364,12 +363,12 @@ void CreateSemaphoreSC()
     printf("\n Khong the khoi tao semaphore");
     kernel->machine->WriteRegister(2, -1);
     delete[] name;
-    increasePC();
+    //increasePC();
     return;
   }
   delete[] name;
   kernel->machine->WriteRegister(2, res);
-  //increasePC();
+  ////increasePC();
   return;
 }
 void WaitSC()
@@ -384,7 +383,7 @@ void WaitSC()
     printf("\n Not enough memory in System");
     kernel->machine->WriteRegister(2, -1);
     delete[] name;
-    increasePC();
+    //increasePC();
     return;
   }
 
@@ -396,13 +395,13 @@ void WaitSC()
     printf("\n Khong ton tai ten semaphore nay!");
     kernel->machine->WriteRegister(2, -1);
     delete[] name;
-    increasePC();
+    //increasePC();
     return;
   }
 
   delete[] name;
   kernel->machine->WriteRegister(2, res);
-  increasePC();
+  //increasePC();
   return;
 }
 void SignalSC()
@@ -416,26 +415,25 @@ void SignalSC()
     printf("\n Not enough memory in System");
     kernel->machine->WriteRegister(2, -1);
     delete[] name;
-    increasePC();
+    //increasePC();
     return;
   }
 
   printf("\n SignalSC:: name: %s", name);
   int res = semTab->Signal(name);
-  printf("\n WTF %s", name);
   if (res == -1)
   {
     DEBUG('a', "\n Khong ton tai ten semaphore nay!");
     printf("\n Khong ton tai ten semaphore nay!");
     kernel->machine->WriteRegister(2, -1);
     delete[] name;
-    increasePC();
+    //increasePC();
     return;
   }
 
   delete[] name;
   kernel->machine->WriteRegister(2, res);
-  increasePC();
+  //increasePC();
   return;
 }
 
