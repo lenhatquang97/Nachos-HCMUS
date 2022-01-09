@@ -419,7 +419,7 @@ void SignalSC()
     return;
   }
 
-  printf("\n SignalSC:: name: %s", name);
+  //printf("\n SignalSC:: name: %s", name);
   int res = semTab->Signal(name);
   if (res == -1)
   {
