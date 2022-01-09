@@ -266,6 +266,14 @@ CurrentThreadId:
 	j 	$31
 	.end CurrentThreadId
 
+	.globl WriteAt
+	.ent	WriteAt
+WriteAt:
+	addiu $2,$0,SC_WriteAt
+	syscall
+	j	$31
+	.end WriteAt
+
 
 /* dummy function to keep gcc happy */
         .globl  __main

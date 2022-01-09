@@ -270,6 +270,65 @@ void WriteSC()
     }
   }
 }
+void WriteAtSC()
+{
+  int virtAddr = kernel->machine->ReadRegister(4);  // Lay dia chi cua tham so buffer tu thanh ghi so 4
+  int charcount = kernel->machine->ReadRegister(5); // Lay charcount tu thanh ghi so 5
+  int id = kernel->machine->ReadRegister(6);        // Lay id cua file tu thanh ghi so 6
+  int pos = kernel->machine->ReadRegister(7);       // Lay pos tu thanh ghi so 7
+  int OldPos;
+  int NewPos;
+  char *buf;
+  buf = User2System(virtAddr, charcount);
+  // Kiem tra id cua file truyen vao co nam ngoai bang mo ta file khong
+  if (id < 0 || id > 9)
+  {
+    printf("\nKhong the write vi id nam ngoai bang mo ta file.");
+    kernel->machine->WriteRegister(2, -1);
+    return;
+  }
+  // Kiem tra file co ton tai khong
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id] == NULL)
+  {
+    printf("\nKhong the write vi file nay khong ton tai.");
+    kernel->machine->WriteRegister(2, -1);
+    return;
+  }
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1)
+  {
+    printf("\nKhong the write file stdin hoac file only read.");
+    kernel->machine->WriteRegister(2, -1);
+    return;
+  }
+  OldPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
+                                                                                           // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
+  //Xet truong hop ghi file read & write (type quy uoc la 0) thi tra ve so byte thuc su
+  if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0)
+  {
+    if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->WriteAt(buf, charcount,pos)) > 0)
+    {
+      // So byte thuc su = NewPos - OldPos
+      NewPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
+      kernel->machine->WriteRegister(2, NewPos - OldPos);
+      delete buf;
+      return;
+    }
+    if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0)
+    {
+      int i = 0;
+      while (buf[i] != 0 && buf[i] != '\n') // Vong lap de write den khi gap ky tu '\n'
+      {
+        kernel->synchConsoleOut->PutChar(buf[i]); // Su dung ham Write cua lop SynchConsole
+        i++;
+      }
+      buf[i] = '\n';
+      kernel->synchConsoleOut->PutChar(buf[i]); // Write ky tu '\n'
+      kernel->machine->WriteRegister(2, i - 1); // Tra ve so byte thuc su write duoc
+      delete buf;
+      return;
+    }
+  }
+}
 
 //Part 2
 void ExecSC()
@@ -368,7 +427,7 @@ void CreateSemaphoreSC()
   }
   delete[] name;
   kernel->machine->WriteRegister(2, res);
-  ////increasePC();
+  ////increasePC(); 
   return;
 }
 void WaitSC()

@@ -57,6 +57,7 @@
 #define SC_Wait 17
 #define SC_Signal 18
 #define SC_CurrentThreadId 19
+#define SC_WriteAt 20
 //Fourth
 
 
@@ -228,6 +229,8 @@ int Wait(char* name);
 int Signal(char* name);
 
 int CurrentThreadId();
+
+int WriteAt(char *buffer, int size, OpenFileId id, int pos);
 
 #endif /* IN_ASM */
 
