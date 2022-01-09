@@ -10,7 +10,7 @@ int main() {
   file_open = Open("./input.txt", 1);
   
   if (create_result == -1) {
-    PrintString("kdimo 7: Can't create main semaphore");
+    PrintString("Khong tao duoc semaphore chinh");
     return 1;
   }
   
@@ -23,11 +23,11 @@ int main() {
 
   create_result = CreateSemaphore("voinuoc", 1);
   if (create_result == -1) {
-    PrintString("kdimo 12: Can't create voinuoc semaphore");
+    PrintString("Khong the tao semaphore voi nuoc");
   }
  
   if (file_open == -1) {
-    PrintString("Can't open file input");
+    PrintString("Khong mo file duoc");
     return 1;
   }
 

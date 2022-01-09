@@ -1,4 +1,5 @@
 #include "sem.h"
+//Wrapper cho quan ly semaphore
 Sem::Sem(char *na, int i)
 {
 	strcpy(this->name, na);

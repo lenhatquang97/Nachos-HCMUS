@@ -112,7 +112,7 @@ ifeq ($(hosttype),unknown)
 PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
-PROGRAMS = add halt shell matmult sort segments ascii help testing_sys_call ping pong scheduler sinhvien kdimo
+PROGRAMS = add halt shell matmult sort segments ascii help testing_sys_call ping pong scheduler sinhvien demo_mot_voi
 endif	
 
 all: $(PROGRAMS)
@@ -200,11 +200,11 @@ sinhvien: sinhvien.o start.o
 	$(COFF2NOFF) sinhvien.coff sinhvien
 
 
-kdimo.o: kdimo.c
-	$(CC) $(CFLAGS) -c kdimo.c
-kdimo: kdimo.o start.o
-	$(LD) $(LDFLAGS) start.o kdimo.o -o kdimo.coff
-	$(COFF2NOFF) kdimo.coff kdimo
+demo_mot_voi.o: demo_mot_voi.c
+	$(CC) $(CFLAGS) -c demo_mot_voi.c
+demo_mot_voi: demo_mot_voi.o start.o
+	$(LD) $(LDFLAGS) start.o demo_mot_voi.o -o demo_mot_voi.coff
+	$(COFF2NOFF) demo_mot_voi.coff demo_mot_voi
 
 clean:
 	$(RM) -f *.o *.ii

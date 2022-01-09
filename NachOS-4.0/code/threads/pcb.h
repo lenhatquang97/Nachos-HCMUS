@@ -22,12 +22,12 @@ private:
     char FileName[32];          // Ten cua tien trinh
 
     Thread* thread;             // Tien trinh cua chuong trinh
-    Bitmap* bmfile;
+    Bitmap* bmfile;             // Bitmap cho file
     int pid;
 public:
     int parentID;               // ID cua tien trinh cha
     
-    OpenFile** fileTable;
+    OpenFile** fileTable;  //fileTable dung de luu tru cac file dang mo
     
     
     PCB(int = 0);               // Contructor
@@ -38,11 +38,11 @@ public:
     int GetNumWait();           // Trả về số lượng tiến trình chờ
 
 
-    int FindFreeSlot();
+    int FindFreeSlot();      // Tim slot trong fileTable
 
-    void JoinWait();            // 1. Tiến trình cha đợi tiến trình con kết thúc
+    void JoinWait();            // Tiến trình cha đợi tiến trình con kết thúc
                         
-    void ExitWait();             // 4. Tiến trình con kết thúc
+    void ExitWait();             //Tiến trình con kết thúc
 
     void JoinRelease();         // 2. Báo cho tiến trình cha thực thi tiếp
     void ExitRelease();         // 3. Cho phép tiến trình con kết thúc
