@@ -22,7 +22,6 @@ char *User2System(int virtAddr, int limit)
   if (kernelBuf == NULL)
     return kernelBuf;
   memset(kernelBuf, 0, limit + 1);
-  //printf("\n Filename u2s:");
   for (i = 0; i < limit; i++)
   {
     //Doc 1 ki tu
@@ -116,7 +115,8 @@ void OpenSC()
     }
     else if (strcmp(tempWrite, "stdout") == 0 && type == 0)
     {
-      kernel->machine->WriteRegister(2, 1); //tra ve OpenFileID
+      //TH la stdout
+      kernel->machine->WriteRegister(2, 1); 
       delete[] tempWrite;
       return;
     }
@@ -127,7 +127,7 @@ void OpenSC()
       {
         openFile->type = type;
         pTab->GetPCB(kernel->currentThread->processID)->fileTable[freeSlot] = openFile;
-        kernel->machine->WriteRegister(2, freeSlot); //tra ve OpenFileID
+        kernel->machine->WriteRegister(2, freeSlot);
         delete[] tempWrite;
         return;
       }
@@ -137,13 +137,14 @@ void OpenSC()
 }
 void CloseSC()
 {
-  OpenFileId fid = kernel->machine->ReadRegister(4);
+  OpenFileId fid;
+  fid = kernel->machine->ReadRegister(4);
   if (fid >= 0 && fid <= 9) //Chi xu li khi fid nam trong [0, 9]
   {
-    if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[fid]) //neu mo file thanh cong
+    if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[fid]) 
     {
-      delete pTab->GetPCB(kernel->currentThread->processID)->fileTable[fid]; //Xoa vung nho luu tru file
-      pTab->GetPCB(kernel->currentThread->processID)->fileTable[fid] = NULL; //Gan vung nho NULL
+      delete pTab->GetPCB(kernel->currentThread->processID)->fileTable[fid]; 
+      pTab->GetPCB(kernel->currentThread->processID)->fileTable[fid] = NULL; 
       kernel->machine->WriteRegister(2, 0);
     }
   }
@@ -151,14 +152,15 @@ void CloseSC()
 }
 void ReadSC()
 {
-  int virtAddr = kernel->machine->ReadRegister(4);  // Lay dia chi cua tham so buffer tu thanh ghi so 4
-  int charcount = kernel->machine->ReadRegister(5); // Lay charcount tu thanh ghi so 5
-  int id = kernel->machine->ReadRegister(6);
-  int OldPos;
-  int NewPos;
+  int OldPos, NewPos;
   char *buf;
+  int virtAddr = kernel->machine->ReadRegister(4); 
+  int charcount = kernel->machine->ReadRegister(5); 
+  int id = kernel->machine->ReadRegister(6);
+  
+  
   buf = User2System(virtAddr, charcount);
-  // Kiem tra id cua file truyen vao co nam ngoai bang mo ta file khong
+  // Kiem tra id nam trong fileTable
   if (id < 0 || id > 9)
   {
     printf("\nKhong the read vi id nam ngoai bang mo ta file.");
@@ -184,14 +186,14 @@ void ReadSC()
   if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1 && strcmp(buf, "stdin") == 0)
   {
     int size = System2User(virtAddr, charcount, buf); // Copy chuoi tu vung system sang vung user
-    kernel->machine->WriteRegister(2, size);          // Tra ve so byte thuc su doc duoc
+    kernel->machine->WriteRegister(2, size);         
     delete buf;
     return;
   }
   if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->Read(buf, charcount)) > 0)
   {
-    // So byte thuc su = NewPos - OldPos
     NewPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
+    // So byte thuc su = NewPos - OldPos
     // Copy chuoi tu vung nho System Space sang User Space
     System2User(virtAddr, NewPos - OldPos, buf);
     kernel->machine->WriteRegister(2, NewPos - OldPos);
@@ -213,8 +215,7 @@ void WriteSC()
   int virtAddr = kernel->machine->ReadRegister(4);  
   int charcount = kernel->machine->ReadRegister(5); 
   int id = kernel->machine->ReadRegister(6);        
-  int OldPos;
-  int NewPos;
+  int OldPos, NewPos;
   char *buf;
   buf = User2System(virtAddr, charcount);
   // Kiem tra id trong fileTable ko

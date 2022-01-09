@@ -1,8 +1,6 @@
 #include "syscall.h"
 
 int main() {
-  //Create Semaphore 
-  //We need to create semaphore with second arg == 0 to use wait function
   int n,i, create_result,file_open;
   char temp;
   
