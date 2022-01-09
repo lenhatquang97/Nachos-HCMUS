@@ -1,28 +1,5 @@
 #include "stable.h"
 
-Sem::Sem(char *na, int i)
-{
-	strcpy(this->name, na);
-	sem = new Semaphore(this->name, i);
-}
-Sem::~Sem()
-{
-	if (sem){
-		delete sem;
-	}
-}
-void Sem::wait()
-{
-	sem->P(); // Down(sem)
-}
-void Sem::signal()
-{
-	sem->V(); // Up(sem)
-}
-char *Sem::GetName()
-{
-	return this->name;
-}
 // Constructor
 STable::STable()
 {
@@ -68,13 +45,11 @@ int STable::Create(char *name, int init)
 	}
 	// Tim slot tren bang semTab trong
 	int id = this->FindFreeSlot();
-
 	// Neu k tim thay thi tra ve -1
 	if (id < 0)
 	{
 		return -1;
 	}
-
 	// Neu tim thay slot trong thi nap Semaphore vao semTab[id]
 	this->semTab[id] = new Sem(name, init);
 	return 0;

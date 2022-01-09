@@ -356,7 +356,7 @@ void CreateSemaphoreSC()
   }
 
   int res = semTab->Create(name, semval);
-  printf("Ayyo wtf");
+  
   if (res == -1)
   {
     DEBUG('a', "\n Khong the khoi tao semaphore");
@@ -366,10 +366,9 @@ void CreateSemaphoreSC()
     increasePC();
     return;
   }
-  printf("Ayyo wtf 2");
   delete[] name;
   kernel->machine->WriteRegister(2, res);
-  increasePC();
+  printf("Ayyo wtf");
   return;
 }
 void WaitSC()
