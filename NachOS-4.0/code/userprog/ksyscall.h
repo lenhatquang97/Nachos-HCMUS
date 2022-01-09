@@ -13,7 +13,7 @@
 
 #include "kernel.h"
 #include "synchconsole.h"
-char *User2System(int virtAddr, int limit)
+char *User2System(int bufferWrite, int limit)
 {
   int i; // index
   int oneChar;
@@ -25,7 +25,7 @@ char *User2System(int virtAddr, int limit)
   for (i = 0; i < limit; i++)
   {
     //Doc 1 ki tu
-    kernel->machine->ReadMem(virtAddr + i, 1, &oneChar);
+    kernel->machine->ReadMem(bufferWrite + i, 1, &oneChar);
     kernelBuf[i] = (char)oneChar;
     if (oneChar == 0)
       break;
@@ -33,7 +33,7 @@ char *User2System(int virtAddr, int limit)
   return kernelBuf;
 }
 
-int System2User(int virtAddr, int len, char *buffer)
+int System2User(int bufferWrite, int len, char *buffer)
 {
   if (len < 0)
     return -1;
@@ -45,7 +45,7 @@ int System2User(int virtAddr, int len, char *buffer)
   {
     oneChar = (int)buffer[i];
     //Ghi 1 ki tu
-    kernel->machine->WriteMem(virtAddr + i, 1, oneChar);
+    kernel->machine->WriteMem(bufferWrite + i, 1, oneChar);
     i++;
   } while (i < len && oneChar != 0);
   return i;
@@ -152,14 +152,14 @@ void CloseSC()
 }
 void ReadSC()
 {
-  int OldPos, NewPos;
+  int OldPosition, NewPosition;
   char *buf;
-  int virtAddr = kernel->machine->ReadRegister(4); 
+  int bufferWrite = kernel->machine->ReadRegister(4); 
   int charcount = kernel->machine->ReadRegister(5); 
   int id = kernel->machine->ReadRegister(6);
   
   
-  buf = User2System(virtAddr, charcount);
+  buf = User2System(bufferWrite, charcount);
   // Kiem tra id nam trong fileTable
   if (id < 0 || id > 9)
   {
@@ -181,22 +181,22 @@ void ReadSC()
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  OldPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Lay old pos
+  OldPosition = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Lay old pos
   //Kiem tra la stdin
   if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 1 && strcmp(buf, "stdin") == 0)
   {
-    int size = System2User(virtAddr, charcount, buf); // Copy chuoi tu vung system sang vung user
+    int size = System2User(bufferWrite, charcount, buf); // Copy chuoi tu vung system sang vung user
     kernel->machine->WriteRegister(2, size);         
     delete buf;
     return;
   }
   if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->Read(buf, charcount)) > 0)
   {
-    NewPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
-    // So byte thuc su = NewPos - OldPos
+    NewPosition = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
+    // So byte thuc su = NewPosition - OldPosition
     // Copy chuoi tu vung nho System Space sang User Space
-    System2User(virtAddr, NewPos - OldPos, buf);
-    kernel->machine->WriteRegister(2, NewPos - OldPos);
+    System2User(bufferWrite, NewPosition - OldPosition, buf);
+    kernel->machine->WriteRegister(2, NewPosition - OldPosition);
     delete buf;
     return;
   }
@@ -212,12 +212,12 @@ void ReadSC()
 }
 void WriteSC()
 {
-  int virtAddr = kernel->machine->ReadRegister(4);  
+  int bufferWrite = kernel->machine->ReadRegister(4);  
   int charcount = kernel->machine->ReadRegister(5); 
   int id = kernel->machine->ReadRegister(6);        
-  int OldPos, NewPos;
+  int OldPosition, NewPosition;
   char *buf;
-  buf = User2System(virtAddr, charcount);
+  buf = User2System(bufferWrite, charcount);
   // Kiem tra id trong fileTable ko
   if (id < 0 || id > 9)
   {
@@ -239,16 +239,16 @@ void WriteSC()
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  OldPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong Lay vi tri OldPos
+  OldPosition = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong Lay vi tri OldPosition
                                                                                           
   //Xet truong hop ghi file read & write (type quy uoc la 0)
   if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0)
   {
     if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->Write(buf, charcount)) > 0)
     {
-      // So byte thuc su = NewPos - OldPos
-      NewPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
-      kernel->machine->WriteRegister(2, NewPos - OldPos);
+      // So byte thuc su = NewPosition - OldPosition
+      NewPosition = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
+      kernel->machine->WriteRegister(2, NewPosition - OldPosition);
       delete buf;
       return;
     }
@@ -271,14 +271,14 @@ void WriteSC()
 }
 void WriteAtSC()
 {
-  int virtAddr = kernel->machine->ReadRegister(4);  
+  int bufferWrite = kernel->machine->ReadRegister(4);  
   int charcount = kernel->machine->ReadRegister(5); 
   int id = kernel->machine->ReadRegister(6);      
   int pos = kernel->machine->ReadRegister(7);      
-  int OldPos;
-  int NewPos;
+  int OldPosition;
+  int NewPosition;
   char *buf;
-  buf = User2System(virtAddr, charcount);
+  buf = User2System(bufferWrite, charcount);
   // Kiem tra id cua file truyen vao co nam ngoai bang mo ta file khong
   if (id < 0 || id > 9)
   {
@@ -299,7 +299,7 @@ void WriteAtSC()
     kernel->machine->WriteRegister(2, -1);
     return;
   }
-  OldPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPos
+  OldPosition = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos(); // Kiem tra thanh cong thi lay vi tri OldPosition
                                                                                            
   //Xet truong hop ghi file read & write 
   if (pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->type == 0)
@@ -307,8 +307,8 @@ void WriteAtSC()
     //WriteAt chi ap dung cho File, thuong dung kem voi seek
     if ((pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->WriteAt(buf, charcount,pos)) > 0)
     {
-      NewPos = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
-      kernel->machine->WriteRegister(2, NewPos - OldPos);
+      NewPosition = pTab->GetPCB(kernel->currentThread->processID)->fileTable[id]->GetCurrentPos();
+      kernel->machine->WriteRegister(2, NewPosition - OldPosition);
       delete buf;
       return;
     }
@@ -332,12 +332,12 @@ void WriteAtSC()
 
 void ExecSC()
 {
-  int virtAddr;
+  int bufferWrite;
   char *name;
-  virtAddr = kernel->machine->ReadRegister(4);
+  bufferWrite = kernel->machine->ReadRegister(4);
   
 
-  name = User2System(virtAddr, 255);
+  name = User2System(bufferWrite, 255);
   if (name == NULL)
   {
     printf("\n Khong du bo nho trong he thong.");
@@ -385,10 +385,10 @@ void ExitSC()
 }
 void CreateSemaphoreSC()
 {
-  int virtAddr = kernel->machine->ReadRegister(4);
+  int bufferWrite = kernel->machine->ReadRegister(4);
   int semval = kernel->machine->ReadRegister(5);
 
-  char *name = User2System(virtAddr, 255);
+  char *name = User2System(bufferWrite, 255);
   if (name == NULL)
   {
     DEBUG('a', "\n Not enough memory in System");
@@ -415,9 +415,9 @@ void CreateSemaphoreSC()
 void WaitSC()
 {
   // int Wait(char* name)
-  int virtAddr = kernel->machine->ReadRegister(4);
+  int bufferWrite = kernel->machine->ReadRegister(4);
 
-  char *name = User2System(virtAddr, 255);
+  char *name = User2System(bufferWrite, 255);
   if (name == NULL)
   {
     DEBUG('a', "\n Not enough memory in System");
@@ -444,9 +444,9 @@ void WaitSC()
 }
 void SignalSC()
 {
-  int virtAddr = kernel->machine->ReadRegister(4);
+  int bufferWrite = kernel->machine->ReadRegister(4);
 
-  char *name = User2System(virtAddr, 255);
+  char *name = User2System(bufferWrite, 255);
   if (name == NULL)
   {
     printf("\n Khong du bo nho trong he thong.");

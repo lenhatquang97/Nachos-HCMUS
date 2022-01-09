@@ -98,7 +98,7 @@ int PTable::JoinUpdate(int id)
 		return -1;
 	}
 
-	// Tăng numWait
+	// Tăng số tiến trình chờ
 	pcb[pcb[id]->parentID]->IncNumWait();
 	
 
@@ -141,7 +141,6 @@ int PTable::ExitUpdate(int exitcode)
     // Gọi JoinRelease để giải phóng tiến trình cha đang đợi nó(nếu có) và ExitWait() để xin tiến trình cha
     // cho phép thoát.
 	pcb[id]->JoinRelease();
-    // 
 	pcb[id]->ExitWait();
 	
 	Remove(id);
